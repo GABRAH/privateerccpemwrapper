@@ -1,0 +1,6 @@
+{
+    "job_title": "Privateer test",
+    "input_pdb": "@TESTDATA/pdb/1mbn.pdb",
+    "shift": 0.5,
+    "keywords": ""
+}
