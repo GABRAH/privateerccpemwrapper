@@ -503,8 +503,8 @@ class PrivateerCLI(object):
         self.args.append('-radiusin')
         self.args.append(self.mask_radius)
 
-        self.appendCommandScript("valstring %s,%s/%s/%s/%s/%s/%s,%s,%s,%s"%(self.container.controlParameters.CODEIN,self.container.controlParameters.RING_OXYGEN,self.container.controlParameters.RING_C1,self.container.controlParameters.RING_C2,self.container.controlParameters.RING_C3,self.container.controlParameters.RING_C4,self.container.controlParameters.RING_C5,self.container.controlParameters.ANOMER,self.container.controlParameters.HAND,self.container.controlParameters.CONFORMATION_PYRANOSE ))
-        self.appendCommandScript("codein %s"%(self.container.controlParameters.CODEIN))
+        # self.appendCommandScript("valstring %s,%s/%s/%s/%s/%s/%s,%s,%s,%s"%(self.container.controlParameters.CODEIN,self.container.controlParameters.RING_OXYGEN,self.container.controlParameters.RING_C1,self.container.controlParameters.RING_C2,self.container.controlParameters.RING_C3,self.container.controlParameters.RING_C4,self.container.controlParameters.RING_C5,self.container.controlParameters.ANOMER,self.container.controlParameters.HAND,self.container.controlParameters.CONFORMATION_PYRANOSE ))
+        # self.appendCommandScript("codein %s"%(self.container.controlParameters.CODEIN))
 
         if self.undefinedsugar:
             if self.input_ring_conformation == "pyranose":
