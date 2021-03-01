@@ -113,135 +113,148 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             required=True)
         self.args_widget.args_layout.addWidget(resolution_input)
 
-        # Map sharpen
-        map_sharpen_input = window_utils.NumberArgInput(
+        # Radius-in
+        maskradius_input = window_utils.NumberArgInput(
             parent=self,
             decimals=1,
-            minimum=-1000,
-            maximum=1000,
-            arg_name='map_sharpen',
-            args=self.args)
-        self.args_widget.args_layout.addWidget(map_sharpen_input)
-
-        # Input seq
-        self.seq_input = window_utils.FileArgInput(
-            parent=self,
-            arg_name='input_seq',
-            args=self.args,
-            label='Input sequence',
-            required=False)
-        self.args_widget.args_layout.addWidget(self.seq_input)
-
-        # Initial model input
-        extend_model_input = window_utils.FileArgInput(
-            parent=self,
-            arg_name='extend_pdb',
-            args=self.args,
-            label='Extend model',
-            file_types=ccpem_file_types.pdb_ext,
-            required=False)
-        self.args_widget.args_layout.addWidget(extend_model_input)
-
-        # Number of Privateer cycles
-        ncycle_input = window_utils.NumberArgInput(
-            parent=self,
-            arg_name='ncycle',
-            args=self.args)
-        self.args_widget.args_layout.addWidget(ncycle_input)
-
-        # Pipeline internal cycles control
-        pipeline_control_frame = window_utils.CCPEMExtensionFrame(
-            button_name='Pipeline control',
-            button_tooltip='Show pipeline controls for number of internal cycles')
-        self.args_widget.args_layout.addLayout(pipeline_control_frame)
-
-        # Set number of internal cycles in 1st Privateer cycle
-        nau1st_ncycle_input = window_utils.NumberArgInput(
-            parent=self,
-            arg_name='ncycle_nau1st',
-            args=self.args)
-        pipeline_control_frame.add_extension_widget(nau1st_ncycle_input)
-
-        # Set number of internal cycles in nth Privateer cycles
-        naunth_ncycle_input = window_utils.NumberArgInput(
-            parent=self,
-            arg_name='ncycle_naunth',
-            args=self.args)
-        pipeline_control_frame.add_extension_widget(naunth_ncycle_input)
-
-        # Set number of Refmac cycles in pipeline
-        ref_ncyle_input = window_utils.NumberArgInput(
-            parent=self,
-            arg_name='ncycle_refmac',
-            args=self.args)
-        pipeline_control_frame.add_extension_widget(ref_ncyle_input)
-
-        # Local refinement option
-        self.local_refinement_input = window_utils.ChoiceArgInput(
-            parent=self,
-            arg_name='local_refinement_on',
-            args=self.args)
-        pipeline_control_frame.add_extension_widget(
-            self.local_refinement_input)
-
-        # Local refinement on, mask radius
-        self.mask_radius_input = window_utils.NumberArgInput(
-            parent=self,
-            decimals=1,
-            step=0.5,
-            minimum=0,
-            required=False,
+            step=0.1,
+            minimum=1,
+            maximum=10,
             arg_name='mask_radius',
-            label='Mask radius',
-            args=self.args)
-        pipeline_control_frame.add_extension_widget(self.mask_radius_input)
-
-        # Ligand library input for Refmac5
-        lib_input = window_utils.FileArgInput(
-            parent=self,
-            label='Input ligand',
-            arg_name='lib_in',
             args=self.args,
-            file_types=ccpem_file_types.lib_ext,
             required=False)
-        pipeline_control_frame.add_extension_widget(lib_input)
+        self.args_widget.args_layout.addWidget(maskradius_input)
+        
 
-        # Extended options
-        extended_options_frame = window_utils.CCPEMExtensionFrame(
-            button_name='Extended options',
-            button_tooltip='Show extended options')
-        self.args_widget.args_layout.addLayout(extended_options_frame)
+        # # Map sharpen
+        # map_sharpen_input = window_utils.NumberArgInput(
+        #     parent=self,
+        #     decimals=1,
+        #     minimum=-1000,
+        #     maximum=1000,
+        #     arg_name='map_sharpen',
+        #     args=self.args)
+        # self.args_widget.args_layout.addWidget(map_sharpen_input)
 
-        # Privateer Keywords
-        self.keyword_entry = window_utils.KeywordArgInput(
-            parent=self,
-            arg_name='keywords',
-            args=self.args)
-        extended_options_frame.add_extension_widget(self.keyword_entry)
+        # # Input seq
+        # self.seq_input = window_utils.FileArgInput(
+        #     parent=self,
+        #     arg_name='input_seq',
+        #     args=self.args,
+        #     label='Input sequence',
+        #     required=False)
+        # self.args_widget.args_layout.addWidget(self.seq_input)
 
-        # refmac Keywords
-        self.keyword_entry2 = window_utils.KeywordArgInput(
-            parent=self,
-            arg_name='refmac_keywords',
-            args=self.args)
-        extended_options_frame.add_extension_widget(self.keyword_entry2)
+        # # Initial model input
+        # extend_model_input = window_utils.FileArgInput(
+        #     parent=self,
+        #     arg_name='extend_pdb',
+        #     args=self.args,
+        #     label='Extend model',
+        #     file_types=ccpem_file_types.pdb_ext,
+        #     required=False)
+        # self.args_widget.args_layout.addWidget(extend_model_input)
 
-        # Set inputs for launcher
-        self.launcher.add_file(
-            arg_name='input_map',
-            file_type='map',
-            description=self.args.input_map.help,
-            selected=True)
-        self.launcher.add_file(
-            arg_name='input_seq',
-            file_type='standard',
-            description=self.args.input_seq.help,
-            selected=False)
-        self.launcher.add_file(
-            arg_name='extend_pdb',
-            file_type='standard',
-            description=self.args.extend_pdb.help,
-            selected=True)
+        # # Number of Privateer cycles
+        # ncycle_input = window_utils.NumberArgInput(
+        #     parent=self,
+        #     arg_name='ncycle',
+        #     args=self.args)
+        # self.args_widget.args_layout.addWidget(ncycle_input)
+
+        # # Pipeline internal cycles control
+        # pipeline_control_frame = window_utils.CCPEMExtensionFrame(
+        #     button_name='Pipeline control',
+        #     button_tooltip='Show pipeline controls for number of internal cycles')
+        # self.args_widget.args_layout.addLayout(pipeline_control_frame)
+
+        # # Set number of internal cycles in 1st Privateer cycle
+        # nau1st_ncycle_input = window_utils.NumberArgInput(
+        #     parent=self,
+        #     arg_name='ncycle_nau1st',
+        #     args=self.args)
+        # pipeline_control_frame.add_extension_widget(nau1st_ncycle_input)
+
+        # # Set number of internal cycles in nth Privateer cycles
+        # naunth_ncycle_input = window_utils.NumberArgInput(
+        #     parent=self,
+        #     arg_name='ncycle_naunth',
+        #     args=self.args)
+        # pipeline_control_frame.add_extension_widget(naunth_ncycle_input)
+
+        # # Set number of Refmac cycles in pipeline
+        # ref_ncyle_input = window_utils.NumberArgInput(
+        #     parent=self,
+        #     arg_name='ncycle_refmac',
+        #     args=self.args)
+        # pipeline_control_frame.add_extension_widget(ref_ncyle_input)
+
+        # # Local refinement option
+        # self.local_refinement_input = window_utils.ChoiceArgInput(
+        #     parent=self,
+        #     arg_name='local_refinement_on',
+        #     args=self.args)
+        # pipeline_control_frame.add_extension_widget(
+        #     self.local_refinement_input)
+
+        # # Local refinement on, mask radius
+        # self.mask_radius_input = window_utils.NumberArgInput(
+        #     parent=self,
+        #     decimals=1,
+        #     step=0.5,
+        #     minimum=0,
+        #     required=False,
+        #     arg_name='mask_radius',
+        #     label='Mask radius',
+        #     args=self.args)
+        # pipeline_control_frame.add_extension_widget(self.mask_radius_input)
+
+        # # Ligand library input for Refmac5
+        # lib_input = window_utils.FileArgInput(
+        #     parent=self,
+        #     label='Input ligand',
+        #     arg_name='lib_in',
+        #     args=self.args,
+        #     file_types=ccpem_file_types.lib_ext,
+        #     required=False)
+        # pipeline_control_frame.add_extension_widget(lib_input)
+
+        # # Extended options
+        # extended_options_frame = window_utils.CCPEMExtensionFrame(
+        #     button_name='Extended options',
+        #     button_tooltip='Show extended options')
+        # self.args_widget.args_layout.addLayout(extended_options_frame)
+
+        # # Privateer Keywords
+        # self.keyword_entry = window_utils.KeywordArgInput(
+        #     parent=self,
+        #     arg_name='keywords',
+        #     args=self.args)
+        # extended_options_frame.add_extension_widget(self.keyword_entry)
+
+        # # refmac Keywords
+        # self.keyword_entry2 = window_utils.KeywordArgInput(
+        #     parent=self,
+        #     arg_name='refmac_keywords',
+        #     args=self.args)
+        # extended_options_frame.add_extension_widget(self.keyword_entry2)
+
+        # # Set inputs for launcher
+        # self.launcher.add_file(
+        #     arg_name='input_map',
+        #     file_type='map',
+        #     description=self.args.input_map.help,
+        #     selected=True)
+        # self.launcher.add_file(
+        #     arg_name='input_seq',
+        #     file_type='standard',
+        #     description=self.args.input_seq.help,
+        #     selected=False)
+        # self.launcher.add_file(
+        #     arg_name='extend_pdb',
+        #     file_type='standard',
+        #     description=self.args.extend_pdb.help,
+        #     selected=True)
 
     def set_rv_ui(self):
         '''

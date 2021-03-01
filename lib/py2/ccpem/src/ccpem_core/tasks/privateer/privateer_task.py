@@ -11,7 +11,6 @@ import os
 from ccpem_core.ccpem_utils import ccpem_argparser
 from ccpem_core import process_manager
 from ccpem_core.tasks import task_utils
-from ccpem_core.tasks.refmac import refmac_task
 from ccpem_core import settings
 
 class Privateer(task_utils.CCPEMTask):
@@ -147,7 +146,7 @@ class Privateer(task_utils.CCPEMTask):
 
         parser.add_argument (   '-input_code',
                                 '--input_code',
-                                help            = 'PDB three letter code,
+                                help            = 'PDB three letter code',
                                 type            = str,
                                 metavar         = 'PDB Code',
                                 default         = None )
@@ -371,7 +370,7 @@ class Privateer(task_utils.CCPEMTask):
                            input_anomer                 = self.args.input_anomer ( ),
                            input_handedness             = self.args.input_handedness( ),
                            input_ring_conformation      = self.args.input_ring_conformation ( ),
-                           input_conformatioself.args.append              (self.input_code)n_pyranose  = self.args.input_conformation_pyranose ( ),
+                           input_conformation_pyranose  = self.args.input_conformation_pyranose ( ),
                            input_conformation_furanose  = self.args.input_conformation_furanose ( ),
                            ring_oxygen                  = self.args.ring_oxygen ( ),
                            ring_C1                      = self.args.ring_C1 ( ),
@@ -382,7 +381,7 @@ class Privateer(task_utils.CCPEMTask):
                            diagram_orientation          = self.args.diagram_orientation ( ),
                            color_scheme                 = self.args.color_scheme ( ),
                            color_scheme_outlines        = self.args.color_scheme_outlines ( ),
-                           ncpus                        = self.args.ncpus ( )
+                           ncpus                        = self.args.ncpus ( ),
                            sleeptimer                   = self.args.sleeptimer ( ) )
         pl = [[pr.process]]
 
@@ -543,7 +542,7 @@ class PrivateerCLI(object):
                     self.args.append              (self.ring_C4)
                 else:
                     text = 'C4 atom was not designated for undefined sugar!'
-                    QtGui.QMessageBox.critical     oldstyle   ( None, 'Error', text )
+                    QtGui.QMessageBox.critical     ( None, 'Error', text )
                     return False
                 if self.ring_C5 is not None:
                     self.args.append              (self.ring_C5)
@@ -552,9 +551,9 @@ class PrivateerCLI(object):
                     QtGui.QMessageBox.critical        ( None, 'Error', text )
                     return False
                 if self.input_anomer is not None:
-                    if self.input_anomer == "alpha"
+                    if self.input_anomer == "alpha":
                         self.args.append              ('A')
-                    elif self.input_anomer == "beta"
+                    elif self.input_anomer == "beta":
                         self.args.append              ('B')
                     else:
                         text = 'Can\'t distinguish input sugar\'s Anomer!'
@@ -565,9 +564,9 @@ class PrivateerCLI(object):
                     QtGui.QMessageBox.critical        ( None, 'Error', text )
                     return False
                 if self.input_handedness is not None:
-                    if self.input_handedness == "-D-"
+                    if self.input_handedness == "-D-":
                         self.args.append              ('D')
-                    elif self.input_handedness == "-L-"
+                    elif self.input_handedness == "-L-":
                         self.args.append              ('L')
                     else:
                         text = 'Can\'t distinguish input sugar\'s handedness!'
@@ -621,14 +620,10 @@ class PrivateerCLI(object):
                     text = 'C4 atom was not designated for undefined sugar!'
                     QtGui.QMessageBox.critical        ( None, 'Error', text )
                     return False
-                else:
-                    text = 'Unknown sugar\'s Anomer was not designated!'
-                    QtGui.QMessageBox.critical        ( None, 'Error', text )
-                    return False
                 if self.input_handedness is not None:
-                    if self.input_handedness == "-D-"
+                    if self.input_handedness == "-D-":
                         self.args.append              ('D')
-                    elif self.input_handedness == "-L-"
+                    elif self.input_handedness == "-L-":
                         self.args.append              ('L')
                     else:
                         text = 'Can\'t distinguish input sugar\'s handedness!'
@@ -694,7 +689,7 @@ class PrivateerCLI(object):
         if self.singlethreaded:
             self.args.append                  ('-singlethreaded')
         
-        if self.ncpus not None and not self.singlethreaded:
+        if self.ncpus is not None and not self.singlethreaded:
             self.args.append                  ('-cores')
             self.args.append                  (self.ncpus)
 
