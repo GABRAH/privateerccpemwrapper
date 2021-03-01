@@ -139,7 +139,7 @@ class Privateer(task_utils.CCPEMTask):
         
         parser.add_argument (   '-undefinedsugar',
                                 '--undefinedsugar',
-                                help            = 'Define a custom sugar which does not have official PDB code',
+                                help            = 'Custom sugar is present in input model file',
                                 metavar         = 'Custom Sugar',
                                 type            = bool,
                                 default         = False )
@@ -254,36 +254,43 @@ class Privateer(task_utils.CCPEMTask):
                                 '--ring_oxygen',
                                 help=('Designate the atom code for anomeric Oxygen'),
                                 type=str,
-                                metavar='Oxygen',
+                                metavar='Ring Oxygen',
                                 default='O5' )
         
         parser.add_argument(    '-ring_C1',
                                 '--ring_C1',
                                 help=('Designate the atom code for first Carbon'),
                                 type=str,
-                                metavar='Carbon 1',
+                                metavar='Ring Carbon 1',
                                 default='C1' )
 
         parser.add_argument(    '-ring_C2',
                                 '--ring_C2',
                                 help=('Designate the atom code for second Carbon, clockwise'),
                                 type=str,
-                                metavar='Carbon 2',
+                                metavar='Ring Carbon 2',
                                 default='C2' )
 
         parser.add_argument(    '-ring_C3',
                                 '--ring_C3',
                                 help=('Designate the atom code for third Carbon, clockwise'),
                                 type=str,
-                                metavar='Carbon 3',
+                                metavar='Ring Carbon 3',
                                 default='C3' )
 
         parser.add_argument(    '-ring_C4',
                                 '--ring_C4',
                                 help=('Designate the atom code for fourth Carbon, clockwise'),
                                 type=str,
-                                metavar='Carbon 4',
+                                metavar='Ring Carbon 4',
                                 default='C4' )
+
+        parser.add_argument(    '-ring_C5',
+                                '--ring_C5',
+                                help=('Designate the atom code for fourth Carbon, clockwise'),
+                                type=str,
+                                metavar='Ring Carbon 5',
+                                default='C5' )
         
         parser.add_argument (   '-diagram_style',
                                 '--diagram_style',

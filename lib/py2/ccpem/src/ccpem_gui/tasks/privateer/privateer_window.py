@@ -27,22 +27,7 @@ from ccpem_core.test_data.tasks import privateer as test_data
         # mpi_layout.addWidget(self.n_mpi_input)
         # self.set_n_mpi_visible()
     
-    # Detect number of CPUs
-    # def set_n_mpi_all_cores(self):
-    #     self.n_mpi_input.set_arg_value(QtCore.QThread.idealThreadCount())
-
-    # def set_n_mpi_half_cores(self):
-    #     self.n_mpi_input.set_arg_value(QtCore.QThread.idealThreadCount() / 2)
-
-        # set_mpi_all_cpus_button = QtGui.QPushButton('Use all CPUs')
-        # set_mpi_all_cpus_button.clicked.connect(self.set_n_mpi_all_cores)
-        # set_mpi_all_cpus_button.setToolTip("Set the number of MPI nodes to use all of the CPU cores on this computer")
-        # mpi_layout.addWidget(set_mpi_all_cpus_button)
-
-        # set_mpi_half_cpus_button = QtGui.QPushButton('Use half CPUs')
-        # set_mpi_half_cpus_button.clicked.connect(self.set_n_mpi_half_cores)
-        # set_mpi_half_cpus_button.setToolTip("Set the number of MPI nodes to use half of the CPU cores on this computer")
-        # mpi_layout.addWidget(set_mpi_half_cpus_button)
+    
 
 
         # Dropdown menu for choice
@@ -131,6 +116,16 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             button_tooltip='Define a sugar not yet part of the CCD')
         self.args_widget.args_layout.addLayout(self.custom_sugar_frame)
 
+        # Sugar in PDB file input?
+        self.confirm_undefined_sugar = window_utils.CheckArgInput(
+            parent=self,
+            label='Custom sugar is present in input model file',
+            label_width=225,
+            arg_name='undefinedsugar',
+            args=self.args,
+            required=True)
+        self.custom_sugar_frame.add_extension_widget(self.confirm_undefined_sugar)
+
         # Custom CCD code
         self.custom_sugar_code = window_utils.StrArgInput(
             parent=self,
@@ -139,6 +134,7 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             args=self.args)
         self.custom_sugar_frame.add_extension_widget(self.custom_sugar_code)
 
+        # Custom Sugar Anomer
         self.custom_anomer = window_utils.ChoiceArgInput(
             parent=self,
             arg_name='input_anomer',
@@ -146,13 +142,15 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             args=self.args)
         self.custom_sugar_frame.add_extension_widget(self.custom_anomer)
 
+        # Custom Sugar Handedness
         self.custom_handedness = window_utils.ChoiceArgInput(
             parent=self,
             arg_name='input_handedness',
             second_width=None,
             args=self.args)
         self.custom_sugar_frame.add_extension_widget(self.custom_handedness)
-
+        
+        # Custom Sugar Ring Conformation
         self.custom_ring_conformation = window_utils.ChoiceArgInput(
             parent=self,
             arg_name='input_ring_conformation',
@@ -160,25 +158,177 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             args=self.args)
         self.custom_sugar_frame.add_extension_widget(self.custom_ring_conformation)
         self.custom_ring_conformation.value_line.currentIndexChanged.connect(
-            self.set_conformation)
+            self.set_conformation_input_options)
+
+        # Custom Sugar Ring Conformation(Pyranose)
+        self.custom_ring_pyranose = window_utils.ChoiceArgInput(
+            parent=self,
+            label_width=225,
+            arg_name='input_conformation_pyranose',
+            second_width=None,
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_pyranose)
+        
+        # Custom Sugar Ring Conformation(Furanose)
+        self.custom_ring_furanose = window_utils.ChoiceArgInput(
+            parent=self,
+            label_width=225,
+            arg_name='input_conformation_furanose',
+            second_width=None,
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_furanose)
+
+        # Custom Sugar Ring Oxygen
+        self.custom_ring_oxygen = window_utils.StrArgInput(
+            parent=self,
+            arg_name='ring_oxygen',
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_oxygen)
+
+        # Custom Sugar Ring Carbon 1
+        self.custom_ring_C1 = window_utils.StrArgInput(
+            parent=self,
+            arg_name='ring_C1',
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_C1)
+
+        # Custom Sugar Ring Carbon 2
+        self.custom_ring_C2 = window_utils.StrArgInput(
+            parent=self,
+            arg_name='ring_C2',
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_C2)
+
+        # Custom Sugar Ring Carbon 3
+        self.custom_ring_C3 = window_utils.StrArgInput(
+            parent=self,
+            arg_name='ring_C3',
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_C3)
+
+        # Custom Sugar Ring Carbon 4
+        self.custom_ring_C4 = window_utils.StrArgInput(
+            parent=self,
+            arg_name='ring_C4',
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_C4)
+
+        # Custom Sugar Ring Carbon 5
+        self.custom_ring_C5 = window_utils.StrArgInput(
+            parent=self,
+            arg_name='ring_C5',
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_C5)
+
+        self.set_conformation_input_options()
+        
+        # Custom GlyTouCan settings frame
+        self.glytoucan_settings_frame = window_utils.CCPEMExtensionFrame(
+            button_name='Validation of Glycans with GlyTouCan and GlyConnect databases.',
+            button_tooltip='Validation of Glycans with GlyTouCan and GlyConnect databases.')
+        self.args_widget.args_layout.addLayout(self.glytoucan_settings_frame)
+
+        # Enable GlyTouCan
+        self.enable_glytoucan = window_utils.CheckArgInput(
+            parent=self,
+            label='Enable Glycan validation with GlyTouCan and GlyConnect databases',
+            label_width=425,
+            arg_name='glytoucan',
+            args=self.args)
+        self.glytoucan_settings_frame.add_extension_widget(self.enable_glytoucan)
+
+        self.glyconnect_disable = window_utils.CheckArgInput(
+            parent=self,
+            label='Don\'t look for closest match on GlyConnect database if input glycan is not found',
+            label_width=500,
+            arg_name='closestmatch',
+            second_width=None,
+            args=self.args)
+        self.glytoucan_settings_frame.add_extension_widget(self.glyconnect_disable)
+
+        self.all_permutations_enable = window_utils.CheckArgInput(
+            parent=self,
+            label='Generate all possible Glycan permutation combinations in looking for the closest match',
+            tooltip_text='Should only be used for O-glycans as computationally very expensive',
+            label_width=550,
+            arg_name='allpermutations',
+            second_width=None,
+            args=self.args)
+        self.glytoucan_settings_frame.add_extension_widget(self.all_permutations_enable)
+
+        self.ncpus = window_utils.NumberArgInput(
+            parent=self,
+            arg_name='ncpus',
+            required=False,
+            args=self.args)
+        mpi_layout.addWidget(self.ncpus)
+        self.ncpus_visible()
+
+
+        # Detect number of CPUs
+        # def set_n_mpi_all_cores(self):
+        #     self.n_mpi_input.set_arg_value(QtCore.QThread.idealThreadCount())
+
+        # def set_n_mpi_half_cores(self):
+        #     self.n_mpi_input.set_arg_value(QtCore.QThread.idealThreadCount() / 2)
+
+        # set_mpi_all_cpus_button = QtGui.QPushButton('Use all CPUs')
+        # set_mpi_all_cpus_button.clicked.connect(self.set_n_mpi_all_cores)
+        # set_mpi_all_cpus_button.setToolTip("Set the number of MPI nodes to use all of the CPU cores on this computer")
+        # mpi_layout.addWidget(set_mpi_all_cpus_button)
+
+        # set_mpi_half_cpus_button = QtGui.QPushButton('Use half CPUs')
+        # set_mpi_half_cpus_button.clicked.connect(self.set_n_mpi_half_cores)
+        # set_mpi_half_cpus_button.setToolTip("Set the number of MPI nodes to use half of the CPU cores on this computer")
+        # mpi_layout.addWidget(set_mpi_half_cpus_button)
+        
+        # Privateer parallelism settings
+        self.parallelism_settings = window_utils.CCPEMExtensionFrame(
+            button_name='Parallelism settings.',
+            button_tooltip='Parallelism settings.')
+        self.args_widget.args_layout.addLayout(self.parallelism_settings)
+
+        # Privateer parallelism settings
+        self.disable_multithreaded = window_utils.CheckArgInput(
+            parent=self,
+            label='Run Privateer in single-threaded mode.',
+            label_width=300,
+            arg_name='singlethreaded',
+            args=self.args)
+        self.parallelism_settings.add_extension_widget(self.enable_glytoucan)
+
+
+        self.all_permutations_enable = window_utils.CheckArgInput(
+            parent=self,
+            label='Generate all possible Glycan permutation combinations in looking for the closest match',
+            tooltip_text='Should only be used for O-glycans as computationally very expensive',
+            label_width=550,
+            arg_name='allpermutations',
+            second_width=None,
+            args=self.args)
+        self.parallelism_settings.add_extension_widget(self.all_permutations_enable)
+
+
     
-    
-    def set_conformation(self):
-        if self.custom_ring_conformation == 'pyranose':
-            self.custom_ring_pyranose = window_utils.ChoiceArgInput(
-                parent=self,
-                arg_name='input_conformation_pyranose',
-                second_width=None,
-                args=self.args)
-            self.custom_sugar_frame.add_extension_widget(self.custom_ring_pyranose)
-            
-        elif self.custom_ring_conformation == 'furanose':
-            self.custom_ring_furanose = window_utils.ChoiceArgInput(
-                parent=self,
-                arg_name='input_conformation_furanose',
-                second_width=None,
-                args=self.args)
-            self.custom_sugar_frame.add_extension_widget(self.custom_ring_furanose)
+    def set_conformation_input_options(self):
+        if self.args.input_ring_conformation.value == 'pyranose':
+            self.custom_ring_pyranose.show()
+            self.custom_ring_furanose.hide()
+            self.custom_ring_oxygen.show()
+            self.custom_ring_C1.show()
+            self.custom_ring_C2.show()
+            self.custom_ring_C3.show()
+            self.custom_ring_C4.show()
+            self.custom_ring_C5.show()
+        elif self.args.input_ring_conformation.value == 'furanose':
+            self.custom_ring_pyranose.hide()
+            self.custom_ring_furanose.show()
+            self.custom_ring_oxygen.show()
+            self.custom_ring_C1.show()
+            self.custom_ring_C2.show()
+            self.custom_ring_C3.show()
+            self.custom_ring_C4.show()
+            self.custom_ring_C5.hide()
 
 
 
