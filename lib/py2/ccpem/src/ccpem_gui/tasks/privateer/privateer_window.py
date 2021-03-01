@@ -84,37 +84,37 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             self.handle_title_set)
 
         # Input map
-        model_input = window_utils.FileArgInput(
+        self.model_input = window_utils.FileArgInput(
             parent=self,
             arg_name='input_model',
             args=self.args,
             label='Input model',
             file_types=ccpem_file_types.pdb_ext,
             required=True)
-        self.args_widget.args_layout.addWidget(model_input)
+        self.args_widget.args_layout.addWidget(self.model_input)
 
         # Input map
-        map_input = window_utils.FileArgInput(
+        self.map_input = window_utils.FileArgInput(
             parent=self,
             arg_name='input_map',
             args=self.args,
             label='Input map',
             file_types=ccpem_file_types.mrc_ext,
             required=True)
-        self.args_widget.args_layout.addWidget(map_input)
+        self.args_widget.args_layout.addWidget(self.map_input)
 
         # Resolution
-        resolution_input = window_utils.NumberArgInput(
+        self.resolution_input = window_utils.NumberArgInput(
             parent=self,
             decimals=1,
             step=0.1,
             arg_name='resolution',
             args=self.args,
             required=True)
-        self.args_widget.args_layout.addWidget(resolution_input)
+        self.args_widget.args_layout.addWidget(self.resolution_input)
 
         # Radius-in
-        maskradius_input = window_utils.NumberArgInput(
+        self.maskradius_input = window_utils.NumberArgInput(
             parent=self,
             decimals=1,
             step=0.1,
@@ -123,138 +123,64 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             arg_name='mask_radius',
             args=self.args,
             required=False)
-        self.args_widget.args_layout.addWidget(maskradius_input)
-        
+        self.args_widget.args_layout.addWidget(self.maskradius_input)
 
-        # # Map sharpen
-        # map_sharpen_input = window_utils.NumberArgInput(
-        #     parent=self,
-        #     decimals=1,
-        #     minimum=-1000,
-        #     maximum=1000,
-        #     arg_name='map_sharpen',
-        #     args=self.args)
-        # self.args_widget.args_layout.addWidget(map_sharpen_input)
+        # Custom Sugar control frame
+        self.custom_sugar_frame = window_utils.CCPEMExtensionFrame(
+            button_name='A sugar I want to validate is not yet part of the Chemical Component Dictionary',
+            button_tooltip='Define a sugar not yet part of the CCD')
+        self.args_widget.args_layout.addLayout(self.custom_sugar_frame)
 
-        # # Input seq
-        # self.seq_input = window_utils.FileArgInput(
-        #     parent=self,
-        #     arg_name='input_seq',
-        #     args=self.args,
-        #     label='Input sequence',
-        #     required=False)
-        # self.args_widget.args_layout.addWidget(self.seq_input)
+        # Custom CCD code
+        self.custom_sugar_code = window_utils.StrArgInput(
+            parent=self,
+            label='Analyse sugar with code',
+            arg_name='input_code',
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_sugar_code)
 
-        # # Initial model input
-        # extend_model_input = window_utils.FileArgInput(
-        #     parent=self,
-        #     arg_name='extend_pdb',
-        #     args=self.args,
-        #     label='Extend model',
-        #     file_types=ccpem_file_types.pdb_ext,
-        #     required=False)
-        # self.args_widget.args_layout.addWidget(extend_model_input)
+        self.custom_anomer = window_utils.ChoiceArgInput(
+            parent=self,
+            arg_name='input_anomer',
+            second_width=None,
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_anomer)
 
-        # # Number of Privateer cycles
-        # ncycle_input = window_utils.NumberArgInput(
-        #     parent=self,
-        #     arg_name='ncycle',
-        #     args=self.args)
-        # self.args_widget.args_layout.addWidget(ncycle_input)
+        self.custom_handedness = window_utils.ChoiceArgInput(
+            parent=self,
+            arg_name='input_handedness',
+            second_width=None,
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_handedness)
 
-        # # Pipeline internal cycles control
-        # pipeline_control_frame = window_utils.CCPEMExtensionFrame(
-        #     button_name='Pipeline control',
-        #     button_tooltip='Show pipeline controls for number of internal cycles')
-        # self.args_widget.args_layout.addLayout(pipeline_control_frame)
+        self.custom_ring_conformation = window_utils.ChoiceArgInput(
+            parent=self,
+            arg_name='input_ring_conformation',
+            second_width=None,
+            args=self.args)
+        self.custom_sugar_frame.add_extension_widget(self.custom_ring_conformation)
+        self.custom_ring_conformation.value_line.currentIndexChanged.connect(
+            self.set_conformation)
+    
+    
+    def set_conformation(self):
+        if self.custom_ring_conformation == 'pyranose':
+            self.custom_ring_pyranose = window_utils.ChoiceArgInput(
+                parent=self,
+                arg_name='input_conformation_pyranose',
+                second_width=None,
+                args=self.args)
+            self.custom_sugar_frame.add_extension_widget(self.custom_ring_pyranose)
+            
+        elif self.custom_ring_conformation == 'furanose':
+            self.custom_ring_furanose = window_utils.ChoiceArgInput(
+                parent=self,
+                arg_name='input_conformation_furanose',
+                second_width=None,
+                args=self.args)
+            self.custom_sugar_frame.add_extension_widget(self.custom_ring_furanose)
 
-        # # Set number of internal cycles in 1st Privateer cycle
-        # nau1st_ncycle_input = window_utils.NumberArgInput(
-        #     parent=self,
-        #     arg_name='ncycle_nau1st',
-        #     args=self.args)
-        # pipeline_control_frame.add_extension_widget(nau1st_ncycle_input)
 
-        # # Set number of internal cycles in nth Privateer cycles
-        # naunth_ncycle_input = window_utils.NumberArgInput(
-        #     parent=self,
-        #     arg_name='ncycle_naunth',
-        #     args=self.args)
-        # pipeline_control_frame.add_extension_widget(naunth_ncycle_input)
-
-        # # Set number of Refmac cycles in pipeline
-        # ref_ncyle_input = window_utils.NumberArgInput(
-        #     parent=self,
-        #     arg_name='ncycle_refmac',
-        #     args=self.args)
-        # pipeline_control_frame.add_extension_widget(ref_ncyle_input)
-
-        # # Local refinement option
-        # self.local_refinement_input = window_utils.ChoiceArgInput(
-        #     parent=self,
-        #     arg_name='local_refinement_on',
-        #     args=self.args)
-        # pipeline_control_frame.add_extension_widget(
-        #     self.local_refinement_input)
-
-        # # Local refinement on, mask radius
-        # self.mask_radius_input = window_utils.NumberArgInput(
-        #     parent=self,
-        #     decimals=1,
-        #     step=0.5,
-        #     minimum=0,
-        #     required=False,
-        #     arg_name='mask_radius',
-        #     label='Mask radius',
-        #     args=self.args)
-        # pipeline_control_frame.add_extension_widget(self.mask_radius_input)
-
-        # # Ligand library input for Refmac5
-        # lib_input = window_utils.FileArgInput(
-        #     parent=self,
-        #     label='Input ligand',
-        #     arg_name='lib_in',
-        #     args=self.args,
-        #     file_types=ccpem_file_types.lib_ext,
-        #     required=False)
-        # pipeline_control_frame.add_extension_widget(lib_input)
-
-        # # Extended options
-        # extended_options_frame = window_utils.CCPEMExtensionFrame(
-        #     button_name='Extended options',
-        #     button_tooltip='Show extended options')
-        # self.args_widget.args_layout.addLayout(extended_options_frame)
-
-        # # Privateer Keywords
-        # self.keyword_entry = window_utils.KeywordArgInput(
-        #     parent=self,
-        #     arg_name='keywords',
-        #     args=self.args)
-        # extended_options_frame.add_extension_widget(self.keyword_entry)
-
-        # # refmac Keywords
-        # self.keyword_entry2 = window_utils.KeywordArgInput(
-        #     parent=self,
-        #     arg_name='refmac_keywords',
-        #     args=self.args)
-        # extended_options_frame.add_extension_widget(self.keyword_entry2)
-
-        # # Set inputs for launcher
-        # self.launcher.add_file(
-        #     arg_name='input_map',
-        #     file_type='map',
-        #     description=self.args.input_map.help,
-        #     selected=True)
-        # self.launcher.add_file(
-        #     arg_name='input_seq',
-        #     file_type='standard',
-        #     description=self.args.input_seq.help,
-        #     selected=False)
-        # self.launcher.add_file(
-        #     arg_name='extend_pdb',
-        #     file_type='standard',
-        #     description=self.args.extend_pdb.help,
-        #     selected=True)
 
     def set_rv_ui(self):
         '''
