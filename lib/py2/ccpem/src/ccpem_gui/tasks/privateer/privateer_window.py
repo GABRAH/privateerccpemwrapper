@@ -52,7 +52,7 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
         super(PrivateerWindow, self).__init__(task=task,
                                              parent=parent)
         self.rv_timer = QtCore.QTimer()
-        self.rv_timer.timeout.connect(self.set_rv_ui)
+        # self.rv_timer.timeout.connect(self.set_rv_ui)
         self.rv_timer.start(1500)
 
     def set_args(self):
@@ -360,75 +360,75 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
 
 
 
-    def set_rv_ui(self):
-        '''
-        RVAPI results viewer.
-        '''
-        if hasattr(self.task, 'job_location'):
-            if self.task.job_location is not None:
-                report = os.path.join(self.task.job_location,
-                                      'report/index.html')
-                if os.path.exists(report):
-                    self.rv_view = QtWebKit.QWebView()
-                    self.rv_view.load(QtCore.QUrl(report))
-                    self.results_dock = QtGui.QDockWidget('Results',
-                                                          self,
-                                                          QtCore.Qt.Widget)
-                    self.results_dock.setToolTip('Results overview')
-                    self.results_dock.setWidget(self.rv_view)
-                    self.tabifyDockWidget(self.setup_dock, self.results_dock)
-                    self.results_dock.show()
-                    self.results_dock.raise_()
-                    self.rv_timer.stop()
+    # def set_rv_ui(self):
+    #     '''
+    #     RVAPI results viewer.
+    #     '''
+    #     if hasattr(self.task, 'job_location'):
+    #         if self.task.job_location is not None:
+    #             report = os.path.join(self.task.job_location,
+    #                                   'report/index.html')
+    #             if os.path.exists(report):
+    #                 self.rv_view = QtWebKit.QWebView()
+    #                 self.rv_view.load(QtCore.QUrl(report))
+    #                 self.results_dock = QtGui.QDockWidget('Results',
+    #                                                       self,
+    #                                                       QtCore.Qt.Widget)
+    #                 self.results_dock.setToolTip('Results overview')
+    #                 self.results_dock.setWidget(self.rv_view)
+    #                 self.tabifyDockWidget(self.setup_dock, self.results_dock)
+    #                 self.results_dock.show()
+    #                 self.results_dock.raise_()
+    #                 self.rv_timer.stop()
 
-    def set_on_job_running_custom(self):
-        # Structure factor from input map
-        if hasattr(self.task, 'process_maptomtz'):
-            self.launcher.add_file(
-                arg_name=None,
-                path=self.task.process_maptomtz.hklout_path,
-                file_type='mtz',
-                description='Structure factors from input map',
-                selected=False)
-        # Add PDB from last Privateer cycle
-        for i in range(1, (self.args.ncycle.value)):
-            path = os.path.dirname(self.task.process_privateer_pipeline.pdbout)
-            fname = os.path.join(path, 'build' + str(i) + '.pdb')
-            self.launcher.add_file(
-                path=fname,
-                file_type='pdb',
-                description='Model built from Privateer cycle #' + str(i),
-                selected=False)
-            path = os.path.dirname(self.task.process_refine.pdbout_path)
-            fname = os.path.join(path, 'refined' + str(i) + '.pdb')
-            self.launcher.add_file(
-                path=fname,
-                file_type='pdb',
-                description='Model built and refined from Privateer cycle #' +
-                str(i),
-                selected=False)
-        # needed this line to refresh the file launcher view
-        self.launcher.set_tree_view()
+    # def set_on_job_running_custom(self):
+    #     # Structure factor from input map
+    #     if hasattr(self.task, 'process_maptomtz'):
+    #         self.launcher.add_file(
+    #             arg_name=None,
+    #             path=self.task.process_maptomtz.hklout_path,
+    #             file_type='mtz',
+    #             description='Structure factors from input map',
+    #             selected=False)
+    #     # Add PDB from last Privateer cycle
+    #     for i in range(1, (self.args.ncycle.value)):
+    #         path = os.path.dirname(self.task.process_privateer_pipeline.pdbout)
+    #         fname = os.path.join(path, 'build' + str(i) + '.pdb')
+    #         self.launcher.add_file(
+    #             path=fname,
+    #             file_type='pdb',
+    #             description='Model built from Privateer cycle #' + str(i),
+    #             selected=False)
+    #         path = os.path.dirname(self.task.process_refine.pdbout_path)
+    #         fname = os.path.join(path, 'refined' + str(i) + '.pdb')
+    #         self.launcher.add_file(
+    #             path=fname,
+    #             file_type='pdb',
+    #             description='Model built and refined from Privateer cycle #' +
+    #             str(i),
+    #             selected=False)
+    #     # needed this line to refresh the file launcher view
+    #     self.launcher.set_tree_view()
 
-    def set_on_job_finish_custom(self):
-        '''
-        Actions to run on job completion.  For now show starting, refined
-        pdb and experimental map.
-        '''
-        if hasattr(self.task, 'process_privateer_pipeline'):
-            if hasattr(self.task, 'process_refine'):
-                self.launcher.add_file(
-                    path=self.task.process_privateer_pipeline.pdbout,
-                    file_type='pdb',
-                    description='Model built from final Privateer cycle',
-                    selected=False)
-                self.launcher.add_file(
-                    path=self.task.process_refine.pdbout_path,
-                    file_type='pdb',
-                    description='Final Privateer built and refined model',
-                    selected=True)
-        self.launcher.set_tree_view()
-        self.launcher_dock.raise_()
+    # def set_on_job_finish_custom(self):
+    #     '''
+    #     Actions to run on job completion.  For now show starting, refined
+    #     pdb and experimental map.
+    #     '''
+    #     if hasattr(self.task, 'process_privateer_pipeline'):
+    #         if hasattr(self.task, 'process_refine'):
+    #             self.launcher.add_file(
+    #                 path=self.task.process_privateer_pipeline.pdbout,
+    #                 file_type='pdb',
+    #                 description='Model built from final Privateer cycle',
+    #                 selected=False)
+    #             self.launcher.add_file(
+    #                 path=self.task.process_refine.pdbout_path,
+    #                 file_type='pdb',
+    #                 description='Final Privateer built and refined model',
+    #                 selected=True)
+    #     self.launcher.set_tree_view()
+    #     self.launcher_dock.raise_()
 
 
 def main():

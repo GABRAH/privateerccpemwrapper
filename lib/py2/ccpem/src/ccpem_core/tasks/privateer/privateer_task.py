@@ -33,7 +33,7 @@ class Privateer(task_utils.CCPEMTask):
 
     commands = {'refmac': settings.which(program='refmac5'),
             'coot': settings.which(program='coot'),
-            'privateer': settings.which('privateer')
+            'privateer': settings.which('/home/harold/Dev/privateer_master/build/executable/./privateer')
             }
 
     def __init__ ( self,
@@ -392,8 +392,8 @@ class Privateer(task_utils.CCPEMTask):
                            sleeptimer                   = self.args.sleeptimer ( ) )
         pl = [[pr.process]]
 
-        custom_finish = PrivateerResultsOnFinish(
-            pipeline_path=self.job_location + '/task.ccpem')
+        # custom_finish = PrivateerResultsOnFinish(
+        #     pipeline_path=self.job_location + '/task.ccpem')
 
         # Run pipeline
         self.pipeline = process_manager.CCPEMPipeline (
