@@ -109,11 +109,11 @@ class Privateer(task_utils.CCPEMTask):
                                 default         = False )
 
         parser.add_argument (   '-singlethreaded',
-                                '--singlethread',
+                                '--singlethreaded',
                                 help            = 'Run Privateer in single threaded mode',
                                 metavar         = 'Single Thread Mode',
                                 type            = bool,
-                                default         = True )
+                                default         = False )
 
         parser.add_argument (   '-mask_radius',
                                 '--mask_radius',
@@ -331,7 +331,7 @@ class Privateer(task_utils.CCPEMTask):
         parser.add_argument(    '-ncpus',
                                 '--ncpus',
                                 help='Number of CPU threads for Privateer',
-                                metavar='CPU',
+                                metavar='No. of Cores',
                                 type=int,
                                 default=None)
         

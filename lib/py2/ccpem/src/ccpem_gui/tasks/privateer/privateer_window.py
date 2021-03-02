@@ -110,6 +110,16 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             required=False)
         self.args_widget.args_layout.addWidget(self.maskradius_input)
 
+        # Expression system
+        self.expression_system = window_utils.ChoiceArgInput(
+            parent=self,
+            label='Validate glycans assuming expression system:',
+            label_width=300,
+            arg_name='expression_system_mode',
+            second_width=None,
+            args=self.args)
+        self.args_widget.args_layout.addWidget(self.expression_system)
+
         # Custom Sugar control frame
         self.custom_sugar_frame = window_utils.CCPEMExtensionFrame(
             button_name='A sugar I want to validate is not yet part of the Chemical Component Dictionary',
@@ -120,7 +130,7 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
         self.confirm_undefined_sugar = window_utils.CheckArgInput(
             parent=self,
             label='Custom sugar is present in input model file',
-            label_width=225,
+            label_width=275,
             arg_name='undefinedsugar',
             args=self.args,
             required=True)
@@ -256,58 +266,76 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
             args=self.args)
         self.glytoucan_settings_frame.add_extension_widget(self.all_permutations_enable)
 
+
+
+        # Privateer parallelism settings
+        self.parallelism_settings = window_utils.CCPEMExtensionFrame(
+            button_name='Parallelism settings(All CPU cores used by default).',
+            button_tooltip='Parallelism settings(All CPU cores used by default).')
+        self.args_widget.args_layout.addLayout(self.parallelism_settings)
+
+        self.privateer_ncpus_widget = QtGui.QWidget()
+        privateer_ncpus_layout = QtGui.QHBoxLayout()
+        self.privateer_ncpus_widget.setLayout(privateer_ncpus_layout)
+        # self.args_widget.args_layout.addWidget(self.privateer_ncpus_widget)
+        self.parallelism_settings.add_extension_widget(self.privateer_ncpus_widget)
+
         self.ncpus = window_utils.NumberArgInput(
             parent=self,
             arg_name='ncpus',
             required=False,
             args=self.args)
-        mpi_layout.addWidget(self.ncpus)
-        self.ncpus_visible()
+        self.ncpus.set_arg_value(QtCore.QThread.idealThreadCount())
+        self.parallelism_settings.add_extension_widget(self.ncpus)
 
-
-        # Detect number of CPUs
-        # def set_n_mpi_all_cores(self):
-        #     self.n_mpi_input.set_arg_value(QtCore.QThread.idealThreadCount())
-
-        # def set_n_mpi_half_cores(self):
-        #     self.n_mpi_input.set_arg_value(QtCore.QThread.idealThreadCount() / 2)
-
-        # set_mpi_all_cpus_button = QtGui.QPushButton('Use all CPUs')
-        # set_mpi_all_cpus_button.clicked.connect(self.set_n_mpi_all_cores)
-        # set_mpi_all_cpus_button.setToolTip("Set the number of MPI nodes to use all of the CPU cores on this computer")
-        # mpi_layout.addWidget(set_mpi_all_cpus_button)
-
-        # set_mpi_half_cpus_button = QtGui.QPushButton('Use half CPUs')
-        # set_mpi_half_cpus_button.clicked.connect(self.set_n_mpi_half_cores)
-        # set_mpi_half_cpus_button.setToolTip("Set the number of MPI nodes to use half of the CPU cores on this computer")
-        # mpi_layout.addWidget(set_mpi_half_cpus_button)
+        set_privateer_ncpus_all_cpus_button = QtGui.QPushButton('Use all CPUs')
+        set_privateer_ncpus_all_cpus_button.clicked.connect(self.set_privateer_all_cores)
+        set_privateer_ncpus_all_cpus_button.setToolTip("Use all of the available Cores available on the CPU on Privateer")
+        privateer_ncpus_layout.addWidget(set_privateer_ncpus_all_cpus_button)
         
-        # Privateer parallelism settings
-        self.parallelism_settings = window_utils.CCPEMExtensionFrame(
-            button_name='Parallelism settings.',
-            button_tooltip='Parallelism settings.')
-        self.args_widget.args_layout.addLayout(self.parallelism_settings)
+
+        set_privateer_ncpus_half_cpus_button = QtGui.QPushButton('Use half CPUs')
+        set_privateer_ncpus_half_cpus_button.clicked.connect(self.set_privateer_half_cores)
+        set_privateer_ncpus_half_cpus_button.setToolTip("Use half of the available Cores available on the CPU on Privateer")
+        privateer_ncpus_layout.addWidget(set_privateer_ncpus_half_cpus_button)
 
         # Privateer parallelism settings
-        self.disable_multithreaded = window_utils.CheckArgInput(
+        self.singlethreaded = window_utils.CheckArgInput(
             parent=self,
             label='Run Privateer in single-threaded mode.',
             label_width=300,
             arg_name='singlethreaded',
             args=self.args)
-        self.parallelism_settings.add_extension_widget(self.enable_glytoucan)
+        self.parallelism_settings.add_extension_widget(self.singlethreaded)
+        self.singlethreaded.value_line.stateChanged.connect(
+            self.set_privateer_ncpus_invisible)
 
-
-        self.all_permutations_enable = window_utils.CheckArgInput(
+        self.sleeptimer = window_utils.NumberArgInput(
             parent=self,
-            label='Generate all possible Glycan permutation combinations in looking for the closest match',
-            tooltip_text='Should only be used for O-glycans as computationally very expensive',
-            label_width=550,
-            arg_name='allpermutations',
-            second_width=None,
+            arg_name='sleeptimer',
+            minimum=1,
+            required=False,
             args=self.args)
-        self.parallelism_settings.add_extension_widget(self.all_permutations_enable)
+        self.parallelism_settings.add_extension_widget(self.sleeptimer)
 
+
+
+    # Detect number of CPUs
+    def set_privateer_all_cores(self):
+        self.ncpus.set_arg_value(QtCore.QThread.idealThreadCount())
+
+    def set_privateer_half_cores(self):
+        self.ncpus.set_arg_value(QtCore.QThread.idealThreadCount() / 2)
+
+    def set_privateer_ncpus_invisible(self):
+        if self.args.singlethreaded():
+            self.privateer_ncpus_widget.hide()
+            self.ncpus.hide()
+            self.sleeptimer.hide()
+        else:
+            self.privateer_ncpus_widget.show()
+            self.ncpus.show()
+            self.sleeptimer.show()
 
     
     def set_conformation_input_options(self):
