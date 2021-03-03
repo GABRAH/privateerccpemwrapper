@@ -12,6 +12,7 @@ from ccpem_core.ccpem_utils import ccpem_argparser
 from ccpem_core import process_manager
 from ccpem_core.tasks import task_utils
 from ccpem_core import settings
+from ccpem_core.tasks.privateer import privateer_results
 
 class Privateer(task_utils.CCPEMTask):
     '''
@@ -717,5 +718,5 @@ class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
 
     def on_finish(self, parent_pipeline=None):
         # generate RVAPI report
-        Privateer_results.PipelineResultsViewer(
+        privateer_results.PipelineResultsViewer(
             pipeline_path=self.pipeline_path)
