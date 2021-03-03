@@ -82,17 +82,63 @@ class PipelineResultsViewer(object):
         '''
         Get data from XML output and fill table
         '''
-        data = []
+        data = collections.OrderedDict()
         tab_name = ''
         len(self.xmlfilename)
         for infile in self.xmlfilename:
             # print infile
             tree = etree.parse(infile)  # self.xmlfilename)
-            i_entries = collections.OrderedDict()
+            PrivateerResult = tree.find('PrivateerResult')
+            ValidationData = PrivateerResult.find('ValidationData')
+            pyranoses = ValidationData.findall("Pyranose")
+            furanoses = ValidationData.findall("Furanse")
+            if len(pyranoses):
+                list_of_pyranoses = []
+                for pyranose in pyranoses:
+                    i_pyranose_dict = collections.OrderedDict()
+                    i_pyranose_dict['Chain'] = pyranose.find('SugarChain')
+                    i_pyranose_dict['Name'] = pyranose.find('SugarName')
+                    i_pyranose_dict['Q'] = pyranose.find('SugarQ')
+                    i_pyranose_dict['Phi'] = pyranose.find('SugarPhi')
+                    i_pyranose_dict['Theta'] = pyranose.find('SugarTheta')
+                    i_pyranose_dict['Anomer'] = pyranose.find('SugarAnomer')
+                    i_pyranose_dict['Hand'] = pyranose.find('SugarHand')
+                    i_pyranose_dict['Conformation'] = pyranose.find('SugarConformation')
+                    i_pyranose_dict['RSCC'] = pyranose.find('SugarRSCC')
+                    i_pyranose_dict['BFactor'] = pyranose.find('SugarBFactor')
+                    i_pyranose_dict['Diagnostic'] = pyranose.find('SugarDiagnostic')
+                    list_of_pyranoses.append(i_pyranose_dict)
+                data['Pyranoses'] = list_of_pyranoses
+            if len(furanoses):
+                list_of_furanoses = []
+                for furanose in furanoses:
+                    i_furanose_dict = collections.OrderedDict()
+                    i_furanose_dict['Chain'] = furanose.find('SugarChain')
+                    i_furanose_dict['Name'] = furanose.find('SugarName')
+                    i_furanose_dict['Q'] = furanose.find('SugarQ')
+                    i_furanose_dict['Phi'] = furanose.find('SugarPhi')
+                    i_furanose_dict['Anomer'] = furanose.find('SugarAnomer')
+                    i_furanose_dict['Hand'] = furanose.find('SugarHand')
+                    i_furanose_dict['Conformation'] = furanose.find('SugarConformation')
+                    i_furanose_dict['RSCC'] = furanose.find('SugarRSCC')
+                    i_furanose_dict['BFactor'] = furanose.find('SugarBFactor')
+                    i_furanose_dict['Diagnostic'] = furanose.find('SugarDiagnostic')
+                    list_of_furanoses.append(i_furanose_dict)
+                data['Furanoses'] = list_of_furanoses
+            
+            if "Pyranoses" in data:
+                print(data['Pyranoses'])
+            
+            if "Furanoses" in data:
+                print(data['Furanoses'])
+
+
+                
+            # print(furanoses)
+
             tab_name = 'Detailed monosaccharide validation data'
-            for parent in tree.findall('PrivateerResult'):
-                print(tree)
-                print("pimpals")
+            # for parent in tree.findall('PrivateerResult'):
+            #     print(tree)
         #         for child in parent:
         #             pyranose_tree = 
         #         i_entries['FragBuilt'] = child.find('FragmentsBuilt')
@@ -246,7 +292,8 @@ class PipelineResultsViewer(object):
 def main(target_dir=None):
     from PyQt4 import QtGui, QtCore, QtWebKit
     if target_dir is None:
-        pl_dir = '/home/harold/ccpem_project/Privateer_22'
+        pl_dir = '/home/harold/ccpem_project/Privateer_30' # with permutations
+        # pl_dir = '/home/harold/ccpem_project/Privateer_22' # permutation-less
     else:
         pl_dir = target_dir
     pipeline_path = pl_dir + '/task.ccpem'
