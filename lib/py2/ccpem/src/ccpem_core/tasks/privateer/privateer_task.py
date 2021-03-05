@@ -393,8 +393,8 @@ class Privateer(task_utils.CCPEMTask):
                            sleeptimer                   = self.args.sleeptimer ( ) )
         pl = [[pr.process]]
 
-        # custom_finish = PrivateerResultsOnFinish(
-        #     pipeline_path=self.job_location + '/task.ccpem')
+        custom_finish = PrivateerResultsOnFinish(
+            pipeline_path=self.job_location + '/task.ccpem')
 
         # Run pipeline
         self.pipeline = process_manager.CCPEMPipeline (
@@ -711,12 +711,11 @@ class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
     '''
 
     def __init__(self,
-                 pipeline_path,
-                 refine_process):
+                 job_location):
         super(PrivateerResultsOnFinish, self).__init__()
-        self.pipeline_path = pipeline_path
+        self.job_location = job_location
 
     def on_finish(self, parent_pipeline=None):
         # generate RVAPI report
         privateer_results.PipelineResultsViewer(
-            pipeline_path=self.pipeline_path)
+            job_location=self.job_location)
