@@ -50,23 +50,30 @@ class PipelineResultsViewer(object):
         self.xmlfilename = os.path.join(self.job_location, infile)
 
         # set results table and graphs
+        results_tab = 'results_tab'
         if self.job_location is not None:
-            privateer_data = self.GetXML2Table('Privateer')
+            privateer_data = self.GetXML2Table('Privateer', results_tab)
             
-
+    def get_reference(self, process):
+        '''
+        Get references to put in a section in results tab
+        '''
+        
+        reference_list = ["\'Privateer: software for the conformational validation of carbohydrate structures.\' \nAgirre J, Iglesias-Fernandez J, Rovira C, Davies GJ, Wilson KS, Cowtan KD. (2014). \nNat Struct Mol Biol. 2015 Nov 4;22(11):833-4. doi: 10.1038/nsmb.3115."]
+        return reference_list
     
-    def GetXML2Table(self, process):
+    def GetXML2Table(self, process, results_tab):
         '''
         Get data from XML output and fill table
         '''
 
         data = collections.OrderedDict()
+        tab_name = 'Results'
         tree = etree.parse(self.xmlfilename)  # self.xmlfilename)
         PrivateerResult = tree.find('PrivateerResult')
         ValidationData = PrivateerResult.find('ValidationData')
         pyranoses = ValidationData.findall("Pyranose")
         furanoses = ValidationData.findall("Furanse")
-        tab_name = 'Detailed monosaccharide validation data'
         if len(pyranoses):
             list_of_pyranoses = []
             for pyranose in pyranoses:
@@ -101,66 +108,133 @@ class PipelineResultsViewer(object):
                 list_of_furanoses.append(i_furanose_dict)
             data['Furanoses'] = list_of_furanoses
 
-        validation_tab = 'validation_tab'
-        validation_sec = 'sec_validation'
-        validation_summary_table = 'validation_table'
-        pyrvapi.rvapi_add_header('Privateer Results')
-        pyrvapi.rvapi_add_tab(validation_tab, 'Validation', True)
-        pyrvapi.rvapi_add_section(validation_sec,
-                                'Monosaccharide summary',
-                                validation_tab,
-                                0, 0, 1, 1, True)
-            
+        validation_sec = 'validation_sec'
+        validation_table = 'validation_table'
+        pyrvapi.rvapi_add_tab(results_tab, tab_name, True)
+        # pyrvapi.rvapi_add_section(
+        #     validation_sec, 'Please reference', results_tab, 0, 0, 1, 1, False)
+        # reference_text = self.get_reference(process)
+        # # add reference to cite found from logfile
+        # r = 0
+        # for i in range(0, len(reference_text)):
+        #     pyrvapi.rvapi_add_text(str(i + 1) + ') ', validation_sec, r, 0, 1, 1)
+        #     for j in range(0, len(reference_text[i])):
+        #         pyrvapi.rvapi_add_text(
+        #             reference_text[i][j], validation_sec, r, 1, 1, 1)
+        #         r += 1
+        pyrvapi.rvapi_flush()
         if "Pyranoses" in data:
-            build_table = 'built_table'
             # set tabs and sections
             pyrvapi.rvapi_add_table(
-                validation_summary_table, 'Validation results for pyranose sugars:', validation_tab, 1, 0, 1, 1, False)
+                validation_table, 'Detailed validation data for Pyranoses', results_tab, 1, 0, 1, 1, False)
             pyrvapi.rvapi_put_horz_theader(
-                validation_summary_table, 'Chain', 'Protein backbone chain ID monosaccharide is a part of', 0)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Name',
-                                        'Monosaccharide\'s PDB CCD code', 1)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Q',
-                                        'Total puckering amplitude, measured in Angstroems', 2)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Phi',
-                                        'Phi of monosaccharide', 3)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Theta',
-                                        'Theta of monosaccharide', 4)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Anomer',
-                                        'Anomer of monosaccharide', 5)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'D/L<sup>2</sup>',
-                                        'Whenever N is displayed in the D/L column, it means that Privateer has been unable to determine the handedness based solely on the structure.', 6)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'RSCC',
-                                        'Real Space Correlation Coefficient.', 7)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, '<BFactor>',
-                                        'BFactor of monosaccharide.', 8)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, '<Diagnosic>',
-                                        'Geometric quality of the monosaccharide.', 9)
-            pyrvapi.rvapi_flush()                               
+                validation_table, '#', 'nth sugar detected in the model', 0)
+            pyrvapi.rvapi_put_horz_theader(
+                validation_table, 'Chain', 'Protein backbone chain ID monosaccharide is a part of', 1)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Name',
+                                        'Monosaccharide\'s PDB CCD code', 2)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Q',
+                                        'Total puckering amplitude, measured in Angstroems', 3)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Phi',
+                                        'Phi of monosaccharide', 4)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Theta',
+                                        'Theta of monosaccharide', 5)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Anomer',
+                                        'Anomer of monosaccharide', 6)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'D/L<sup>2</sup>',
+                                        'Whenever N is displayed in the D/L column, it means that Privateer has been unable to determine the handedness based solely on the structure.', 7)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Conformation',
+                                        'Conformation of the sugar.', 8)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'RSCC',
+                                        'Real Space Correlation Coefficient.', 9)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'BFactor',
+                                        'BFactor of monosaccharide.', 10)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Diagnosic',
+                                        'Geometric quality of the monosaccharide.', 11)
+
+            i = 0  # row
+            for entries in data['Pyranoses']:
+                j = 0  # column
+                for name in entries:
+                    if j == 0:
+                        pyrvapi.rvapi_put_table_string(
+                            validation_table, str(i + 1), i, j)  # fill in cycle number
+                        j += 1  # %0.1f %
+                        # if name == 'CompByRes':
+                        #     value = float(entries[name].text) * 100
+                        #     pyrvapi.rvapi_put_table_string(
+                        #         validation_table, '%0.1f' % value, i, j)  # fill in % value
+                        # else:
+                        pyrvapi.rvapi_put_table_string(
+                            validation_table, entries[name].text, i, j)  # fill in built values
+                    else:
+                    # if name == 'CompByChain':
+                    #     value = float(entries[name].text) * 100
+                    #     pyrvapi.rvapi_put_table_string(
+                    #         validation_table, '%0.1f' % value, i, j)  # fill in % value
+                    # else:
+                        pyrvapi.rvapi_put_table_string(
+                            validation_table, entries[name].text, i, j)  # fill in built values
+                    j += 1
+                i += 1
+            pyrvapi.rvapi_flush()  
         if "Furanoses" in data:
-            validation_summary_table = 'built_table'
             pyrvapi.rvapi_add_tab(validation_tab, tab_name, True)
             pyrvapi.rvapi_add_table(
-                validation_summary_table, 'Validation results for furanose sugars:', validation_tab, 1, 0, 1, 1, False)
+                validation_table, 'Detailed validation data for Furanoses', results_tab, 1, 0, 1, 1, False)
             pyrvapi.rvapi_put_horz_theader(
-                validation_summary_table, 'Chain', 'Protein backbone chain ID monosaccharide is a part of', 0)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Name',
-                                        'Monosaccharide\'s PDB CCD code', 1)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Q',
-                                        'Total puckering amplitude, measured in Angstroems', 2)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Phi',
-                                        'Phi of monosaccharide', 3)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'Anomer',
-                                        'Anomer of monosaccharide', 4)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'D/L<sup>2</sup>',
-                                        'Whenever N is displayed in the D/L column, it means that Privateer has been unable to determine the handedness based solely on the structure.', 5)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, 'RSCC',
-                                        'Real Space Correlation Coefficient.', 6)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, '<BFactor>',
-                                        'BFactor of monosaccharide.', 7)
-            pyrvapi.rvapi_put_horz_theader(validation_summary_table, '<Diagnosic>',
-                                        'Geometric quality of the monosaccharide.', 8)
-            pyrvapi.rvapi_flush()    
+                validation_table, '#', 'nth sugar detected in the model', 0)
+            pyrvapi.rvapi_put_horz_theader(
+                validation_table, 'Chain', 'Protein backbone chain ID monosaccharide is a part of', 1)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Name',
+                                        'Monosaccharide\'s PDB CCD code', 2)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Q',
+                                        'Total puckering amplitude, measured in Angstroems', 3)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Phi',
+                                        'Phi of monosaccharide', 4)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Theta',
+                                        'Theta of monosaccharide', 5)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Anomer',
+                                        'Anomer of monosaccharide', 6)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'D/L<sup>2</sup>',
+                                        'Whenever N is displayed in the D/L column, it means that Privateer has been unable to determine the handedness based solely on the structure.', 7)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Conformation',
+                                        'Conformation of the sugar.', 8)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'RSCC',
+                                        'Real Space Correlation Coefficient.', 9)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'BFactor',
+                                        'BFactor of monosaccharide.', 10)
+            pyrvapi.rvapi_put_horz_theader(validation_table, 'Diagnosic',
+                                        'Geometric quality of the monosaccharide.', 11)
+            
+            i = 0  # row
+            for entries in data['Pyranoses']:
+                j = 0  # column
+                for name in entries:
+                    if j == 0:
+                        pyrvapi.rvapi_put_table_string(
+                            validation_table, str(i + 1), i, j)  # fill in cycle number
+                        j += 1  # %0.1f %
+                        # if name == 'CompByRes':
+                        #     value = float(entries[name].text) * 100
+                        #     pyrvapi.rvapi_put_table_string(
+                        #         validation_table, '%0.1f' % value, i, j)  # fill in % value
+                        # else:
+                        pyrvapi.rvapi_put_table_string(
+                            validation_table, entries[name].text, i, j)  # fill in built values
+                    else:
+                    # if name == 'CompByChain':
+                    #     value = float(entries[name].text) * 100
+                    #     pyrvapi.rvapi_put_table_string(
+                    #         validation_table, '%0.1f' % value, i, j)  # fill in % value
+                    # else:
+                        pyrvapi.rvapi_put_table_string(
+                            validation_table, entries[name].text, i, j)  # fill in built values
+                    j += 1
+                i += 1
+            pyrvapi.rvapi_flush() 
+
+        return data
 
 
 
