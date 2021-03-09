@@ -52,8 +52,9 @@ class PipelineResultsViewer(object):
         # set results table and graphs
         results_tab = 'results_tab'
         if self.job_location is not None:
-            privateer_data = self.GetXML2Table('Privateer', results_tab)
+            privateer_data = self.GetXML2Table('Privateer', results_tab, self.xmlfilename)
             self.validation_summary_graph(privateer_data, results_tab)
+            self.display_glycan_chains(results_tab, self.xmlfilename)
 
             
     def get_reference(self, process):
@@ -64,14 +65,14 @@ class PipelineResultsViewer(object):
         reference_list = ["\'Privateer: software for the conformational validation of carbohydrate structures.\' \nAgirre J, Iglesias-Fernandez J, Rovira C, Davies GJ, Wilson KS, Cowtan KD. (2014). \nNat Struct Mol Biol. 2015 Nov 4;22(11):833-4. doi: 10.1038/nsmb.3115."]
         return reference_list
     
-    def GetXML2Table(self, process, results_tab):
+    def GetXML2Table(self, process, results_tab, xmlfilename):
         '''
         Get data from XML output and fill table
         '''
 
         data = collections.OrderedDict()
-        tab_name = 'Results'
-        tree = etree.parse(self.xmlfilename)  # self.xmlfilename)
+        tab_name = 'Sugar view'
+        tree = etree.parse(xmlfilename)  # self.xmlfilename)
         PrivateerResult = tree.find('PrivateerResult')
         ValidationData = PrivateerResult.find('ValidationData')
         pyranoses = ValidationData.findall("Pyranose")
@@ -115,15 +116,6 @@ class PipelineResultsViewer(object):
         pyrvapi.rvapi_add_tab(results_tab, tab_name, True)
         pyrvapi.rvapi_add_section(
             validation_sec, 'Detailed Monosaccharide validation results', results_tab, 0, 0, 1, 1, False)
-        # reference_text = self.get_reference(process)
-        # # add reference to cite found from logfile
-        # r = 0
-        # for i in range(0, len(reference_text)):
-        #     pyrvapi.rvapi_add_text(str(i + 1) + ') ', validation_sec, r, 0, 1, 1)
-        #     for j in range(0, len(reference_text[i])):
-        #         pyrvapi.rvapi_add_text(
-        #             reference_text[i][j], validation_sec, r, 1, 1, 1)
-        #         r += 1
         pyrvapi.rvapi_flush()
         if "Pyranoses" in data:
             # set tabs and sections
@@ -271,6 +263,54 @@ class PipelineResultsViewer(object):
         dx_y_Bravo.set_options(color='black', style=API.LINE_Off, width=1.0)
         API.flush()
 
+    def display_glycan_chains(self, results_tab, xmlfilename):
+        tree = etree.parse(xmlfilename)  # self.xmlfilename)
+        PrivateerResult = tree.find('PrivateerResult')
+        ValidationData = PrivateerResult.find('ValidationData')
+        glycans = ValidationData.findall("Glycan")
+        list_of_glycans = []
+        if len(glycans):
+            list_of_glycans = []
+            for glycan in glycans:
+                i_glycan_dict = collections.OrderedDict()
+                i_glycan_dict['WURCS'] = glycan.find('GlycanWURCS')
+                i_glycan_dict['GTCID'] = glycan.find('GlycanGTCID')
+                i_glycan_dict['GlyConnectID'] = glycan.find('GlycanGlyConnectID')
+                i_glycan_dict['SVG'] = glycan.find('GlycanSVG')
+                permutationList = glycan.find('GlycanPermutations')
+                if permutationList is not None:
+                    permutations = permutationList.findall('GlycanPermutation')
+                    list_of_permutations = []
+                    for permutation in permutations:
+                        i_permutation_dict = collections.OrderedDict()
+                        i_permutation_dict['PermutationsWURCS'] = permutation.find('PermutationsWURCS')
+                        i_permutation_dict['PermutationsScore'] = permutation.find('PermutationsScore')
+                        i_permutation_dict['anomerPermutations'] = permutation.find('anomerPermutations')
+                        i_permutation_dict['residuePermutations'] = permutation.find('residuePermutations')
+                        i_permutation_dict['residueDeletions'] = permutation.find('residueDeletions')
+                        i_permutation_dict['PermutationGTCID'] = permutation.find('PermutationGTCID')
+                        i_permutation_dict['PermutationGlyConnectID'] = permutation.find('PermutationGlyConnectID')
+                        i_permutation_dict['PermutationSVG'] = permutation.find('PermutationSVG')
+                        list_of_permutations.append(i_permutation_dict)
+                    i_glycan_dict['Permutations'] = list_of_permutations
+                else:
+                    i_glycan_dict['Permutations'] = None
+                list_of_glycans.append(i_glycan_dict)
+        
+        print(list_of_glycans)
+        print(len(list_of_glycans))
+        
+        
+        
+        
+        tab_name = 'Glycan view'
+        glycan_tab = 'glycan_tab'
+        chain_sec = 'chain_sec'
+
+        pyrvapi.rvapi_add_tab(glycan_tab, tab_name, True)
+        pyrvapi.rvapi_add_section(
+            chain_sec, 'Detected Glycan chains in the input model', glycan_tab, 0, 0, 1, 1, False)
+        pyrvapi.rvapi_flush()
 
 def main(target_dir=None):
     from PyQt4 import QtGui, QtCore, QtWebKit
