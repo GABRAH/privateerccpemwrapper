@@ -53,6 +53,7 @@ class PipelineResultsViewer(object):
         results_tab = 'results_tab'
         if self.job_location is not None:
             privateer_data = self.GetXML2Table('Privateer', results_tab)
+            self.validation_summary_graph(privateer_data, results_tab)
 
             
     def get_reference(self, process):
@@ -112,8 +113,8 @@ class PipelineResultsViewer(object):
         validation_sec = 'validation_sec'
         validation_table = 'validation_table'
         pyrvapi.rvapi_add_tab(results_tab, tab_name, True)
-        # pyrvapi.rvapi_add_section(
-        #     validation_sec, 'Please reference', results_tab, 0, 0, 1, 1, False)
+        pyrvapi.rvapi_add_section(
+            validation_sec, 'Detailed Monosaccharide validation results', results_tab, 0, 0, 1, 1, False)
         # reference_text = self.get_reference(process)
         # # add reference to cite found from logfile
         # r = 0
@@ -127,7 +128,7 @@ class PipelineResultsViewer(object):
         if "Pyranoses" in data:
             # set tabs and sections
             pyrvapi.rvapi_add_table(
-                validation_table, 'Detailed validation data for Pyranoses', results_tab, 1, 0, 1, 1, False)
+                validation_table, 'Detailed validation data for Pyranoses', validation_sec, 1, 0, 1, 1, False)
             pyrvapi.rvapi_put_horz_theader(
                 validation_table, '#', 'nth sugar detected in the model', 0)
             pyrvapi.rvapi_put_horz_theader(
@@ -160,20 +161,10 @@ class PipelineResultsViewer(object):
                     if j == 0:
                         pyrvapi.rvapi_put_table_string(
                             validation_table, str(i + 1), i, j)  # fill in cycle number
-                        j += 1  # %0.1f %
-                        # if name == 'CompByRes':
-                        #     value = float(entries[name].text) * 100
-                        #     pyrvapi.rvapi_put_table_string(
-                        #         validation_table, '%0.1f' % value, i, j)  # fill in % value
-                        # else:
+                        j += 1  
                         pyrvapi.rvapi_put_table_string(
                             validation_table, entries[name].text, i, j)  # fill in built values
                     else:
-                    # if name == 'CompByChain':
-                    #     value = float(entries[name].text) * 100
-                    #     pyrvapi.rvapi_put_table_string(
-                    #         validation_table, '%0.1f' % value, i, j)  # fill in % value
-                    # else:
                         pyrvapi.rvapi_put_table_string(
                             validation_table, entries[name].text, i, j)  # fill in built values
                     j += 1
@@ -182,7 +173,7 @@ class PipelineResultsViewer(object):
         if "Furanoses" in data:
             pyrvapi.rvapi_add_tab(validation_tab, tab_name, True)
             pyrvapi.rvapi_add_table(
-                validation_table, 'Detailed validation data for Furanoses', results_tab, 1, 0, 1, 1, False)
+                validation_table, 'Detailed validation data for Furanoses', validation_sec, 1, 0, 1, 1, False)
             pyrvapi.rvapi_put_horz_theader(
                 validation_table, '#', 'nth sugar detected in the model', 0)
             pyrvapi.rvapi_put_horz_theader(
@@ -235,10 +226,49 @@ class PipelineResultsViewer(object):
         Make <B-Factor> vs Real Space CC 
         '''
         # make graph widget
+        pyranoses = validationdata['Pyranoses']
+
         graphWid1 = API.loggraph(results_tab)
-        brdata = API.graph_data(graphWid1, 'Summary of detected Pyranose Sugars')
-        dx = API.graph
-        
+        brdata = API.graph_data(graphWid1, 'Summary of detected pyranoses')
+        dx_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
+        dy_Alpha = API.graph_dataset(brdata, 'Sugar', 'y1', isint=False)
+        ycol_Alpha = 'Theta'
+        xcol_Alpha = 'Phi'
+        yaxlabel_Alpha = 'Theta'
+        xmax_Alpha = len(pyranoses)
+        for i in range(0, xmax_Alpha):
+            dx_Alpha.add_datum(float(pyranoses[i][xcol_Alpha].text))
+            dy_Alpha.add_datum(float(pyranoses[i][ycol_Alpha].text))
+        plotAlpha = API.graph_plot(graphWid1, "Conformational landscape for pyranoses", xcol_Alpha, yaxlabel_Alpha)
+        plotAlpha.reset_xticks()
+        plotAlpha.reset_yticks()
+        for i in range(360, -1, -30):
+            plotAlpha.add_xtick(i, '%d' % (i))
+        for i in range(180, -1, -45):
+            plotAlpha.add_ytick(i, '%d' % (i))
+        dx_y_Alpha = API.plot_line(plotAlpha, brdata, dx_Alpha, dy_Alpha)
+        dx_y_Alpha.set_options(color='black', style=API.LINE_Off, width=1.0)
+
+        dx_Bravo = API.graph_dataset(brdata, 'Isotropic B-Factor', 'Isotropic B-Factor', isint=False)
+        dy_Bravo = API.graph_dataset(brdata, 'Sugar', 'y1', isint=False)
+        ycol_Bravo = 'RSCC'
+        xcol_Bravo = 'BFactor'
+        yaxlabel_Bravo = 'Real Space CC'
+        xaxlabel_Bravo = 'Isotropic B-Factor'
+        xmax_Bravo = len(pyranoses)
+        for i in range(0, xmax_Bravo):
+            dx_Bravo.add_datum(float(pyranoses[i][xcol_Bravo].text))
+            dy_Bravo.add_datum(float(pyranoses[i][ycol_Bravo].text))
+        plotBravo = API.graph_plot(graphWid1, "BFactor vs RSCC", xaxlabel_Bravo, yaxlabel_Bravo)
+        plotBravo.reset_xticks()
+        plotBravo.reset_yticks()
+        yticks = [0.0, 0.5, 0.7, 1.0]
+        for i in range(0, 101, 20):
+            plotBravo.add_xtick(i, '%d' % (i))
+        for i in yticks:
+            plotBravo.add_ytick(i, '%.1f' % (i))
+        dx_y_Bravo = API.plot_line(plotBravo, brdata, dx_Bravo, dy_Bravo)
+        dx_y_Bravo.set_options(color='black', style=API.LINE_Off, width=1.0)
         API.flush()
 
 
