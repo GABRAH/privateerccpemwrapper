@@ -297,12 +297,6 @@ class PipelineResultsViewer(object):
                     i_glycan_dict['Permutations'] = None
                 list_of_glycans.append(i_glycan_dict)
         
-        print(list_of_glycans)
-        print(len(list_of_glycans))
-        
-        
-        
-        
         tab_name = 'Glycan view'
         glycan_tab = 'glycan_tab'
         chain_sec = 'chain_sec'
@@ -311,6 +305,32 @@ class PipelineResultsViewer(object):
         pyrvapi.rvapi_add_section(
             chain_sec, 'Detected Glycan chains in the input model', glycan_tab, 0, 0, 1, 1, False)
         pyrvapi.rvapi_flush()
+
+        for glycan in list_of_glycans:
+            modelledGlycanSVGName = glycan['SVG'].text
+            modelledGlycanSVGPath = os.path.join(self.job_location, modelledGlycanSVGName)
+            if os.path.isfile(modelledGlycanSVGPath):
+                svg_file = open(modelledGlycanSVGPath, 'r')
+                svg_string = svg_file.read()
+                svg_file.close()
+
+                svg_string_partitioned = svg_string.partition("width=\"")
+                svg_width = ''
+                for symbol in svg_string_partitioned[2]:
+                    if symbol != "\"":
+                        svg_width = svg_width + symbol
+                    else:
+                        break
+                modelledGlycanWURCS = glycan['WURCS'].text
+                modelledGlycanGTCID = glycan['GTCID'].text
+                modelledGlycanGlyConnectID = glycan['GlyConnectID'].text
+                pyrvapi.rvapi_add_text("<p><img src={} alt='' </p>".format(modelledGlycanSVGPath),
+                                    chain_sec, 1, 0, 1, 1)
+
+
+
+            pyrvapi.rvapi_flush()
+        
 
 def main(target_dir=None):
     from PyQt4 import QtGui, QtCore, QtWebKit
