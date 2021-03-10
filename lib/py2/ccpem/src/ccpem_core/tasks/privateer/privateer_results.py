@@ -15,6 +15,9 @@ from ccpem_core.ccpem_utils.ccp4_log_parser import smartie
 from ccpem_core.data_model import metadata_utils
 import pyrvapi_ext as API
 
+# PyQt4 with some elements displayed as HTML objects is the way to go. 
+# ProSmart and DockEM are examples to use.
+# https://stackoverflow.com/questions/17196370/how-to-place-qwebview-in-qtabwidget
 
 class PipelineResultsViewer(object):
     # class ResultViewer(object):
