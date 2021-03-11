@@ -1,6 +1,7 @@
 import sys
 import re
 import os
+import io
 import time
 import pyrvapi
 import fileinput
@@ -276,6 +277,7 @@ class PipelineResultsViewer(object):
             list_of_glycans = []
             for glycan in glycans:
                 i_glycan_dict = collections.OrderedDict()
+                i_glycan_dict['Chain'] = glycan.find('GlycanChain')
                 i_glycan_dict['WURCS'] = glycan.find('GlycanWURCS')
                 i_glycan_dict['GTCID'] = glycan.find('GlycanGTCID')
                 i_glycan_dict['GlyConnectID'] = glycan.find('GlycanGlyConnectID')
@@ -304,12 +306,43 @@ class PipelineResultsViewer(object):
         glycan_tab = 'glycan_tab'
         chain_sec = 'chain_sec'
 
+        self.glycanViewHTMLoutput = self.generate_HTML_glycan_view(list_of_glycans)
+
         pyrvapi.rvapi_add_tab(glycan_tab, tab_name, True)
         pyrvapi.rvapi_add_section(
             chain_sec, 'Detected Glycan chains in the input model', glycan_tab, 0, 0, 1, 1, False)
+        pyrvapi.rvapi_add_text(self.glycanViewHTMLoutput,
+                                    chain_sec, 1, 0, 1, 1)
         pyrvapi.rvapi_flush()
-
+    
+    def generate_HTML_glycan_view(self, list_of_glycans):
+        html = etree.Element('html')
+        head = etree.Element('head')
+        
+        style = etree.Element('style')
+        style.text = "html { \
+            line-height: 1.6em; \
+            font-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans-Serif; \
+            margin: 10px; \
+            text-align: left; \
+            border-collapse: collapse; \
+            clear: both; }"
+        head.append(style)
+        html.append(head)
+        
+        body = etree.Element('body')
+        html.append(body)
+        
+        divGlobal = etree.Element('div', attrib={'class': 'global'})
+        explanationParagraph = etree.Element('p')
+        explanationParagraph.text = "Below are graphical plots of the detected glycan trees. Placing your mouse pointer over any of the sugars will display a tooltip containing its residue name and number from the PDB file."
+        divGlobal.append(explanationParagraph)
+        
         for glycan in list_of_glycans:
+            chainParagraph = etree.Element('p', attrib={'style': 'font-size:130%; padding:2px; margin-top:20px; margin-bottom:0px; font-weight:bold; margin-left:15px; clear:both'})
+            modelledGlycanChainID = glycan['Chain'].text
+            chainParagraph.text = "Chain " + modelledGlycanChainID
+            divGlobal.append(chainParagraph)
             modelledGlycanSVGName = glycan['SVG'].text
             modelledGlycanSVGPath = os.path.join(self.job_location, modelledGlycanSVGName)
             if os.path.isfile(modelledGlycanSVGPath):
@@ -324,16 +357,34 @@ class PipelineResultsViewer(object):
                         svg_width = svg_width + symbol
                     else:
                         break
-                modelledGlycanWURCS = glycan['WURCS'].text
-                modelledGlycanGTCID = glycan['GTCID'].text
-                modelledGlycanGlyConnectID = glycan['GlyConnectID'].text
-                pyrvapi.rvapi_add_text("<p><img src={} alt='' </p>".format(modelledGlycanSVGPath),
-                                    chain_sec, 1, 0, 1, 1)
-
-
-
-            pyrvapi.rvapi_flush()
+                
+                ElementTreeSVGsource = etree.parse(modelledGlycanSVGPath)
+                ElementSVGsource = ElementTreeSVGsource.getroot()
+                divBetweenPandSVG = etree.Element('div', attrib={'style': 'border-width:1px; padding-top:10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
+                divGlobal.append(divBetweenPandSVG)
+                divSVG = etree.Element('div', attrib={'style': 'float:right; padding-right:10px;'})
+                divSVG.append(ElementSVGsource)
+                divBetweenPandSVG.append(divSVG)
+                divCLEAR = etree.Element('div', attrib={'style': 'clear:both'})
+                divBetweenPandSVG.append(divCLEAR)
+                divGlobal.append(divBetweenPandSVG)
+                
+                # modelledGlycanWURCS = glycan['WURCS'].text
+                # modelledGlycanGTCID = glycan['GTCID'].text
+                # modelledGlycanGlyConnectID = glycan['GlyConnectID'].text
+            
         
+        body.append(divGlobal)
+        
+
+        self.glycanViewHTML = os.path.join(self.directory, 'glycanview.html')
+        etree.ElementTree(html).write(self.glycanViewHTML, pretty_print=True, encoding='utf-8',
+                             method='html')
+        glycanViewHACK = etree.parse(self.glycanViewHTML) 
+        finalHTMLoutput = etree.tostring(glycanViewHACK, pretty_print=True)
+        # print(finalHTMLoutput)
+        return finalHTMLoutput
+
 
 def main(target_dir=None):
     from PyQt4 import QtGui, QtCore, QtWebKit
