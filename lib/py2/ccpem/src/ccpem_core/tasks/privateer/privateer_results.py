@@ -326,11 +326,52 @@ class PipelineResultsViewer(object):
             margin: 10px; \
             text-align: left; \
             border-collapse: collapse; \
-            clear: both; }"
+            clear: both; } \
+            \
+            \
+            folder { \
+            display:block; \
+            color:#E0000; \
+            text-decoration:none; \
+            margin:3px; \
+            max-width:1000px; \
+            height:1.6em; \
+            padding:1px; \
+            padding-left:10px; \
+            padding-right:10px; \
+            border:2px solid #DDD; \
+            text-align:left; \
+            font-size:125%; \
+            \
+            -moz-border-radius:10px; \
+            -webkit-border-radius:10px; \
+            -o-border-radius:10px; \
+            border-radius:1px; \
+            \
+            background:#CED4D4; \
+            background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#EEE)); \
+            background:-moz-linear-gradient(0% 90% 90deg, #EEE, #FFF); }"
+        script = etree.Element('script')
+        script.text = " \
+                var coll = document.getElementsByClassName(\"folder\"); \
+                var i; \
+                \
+                for (i = 0; i < coll.length; i++) { \
+                coll[i].addEventListener(\"click\", function() { \
+                    this.classList.toggle(\"active\"); \
+                    var content = this.nextElementSibling; \
+                    if (content.style.display === \"block\") { \
+                    content.style.display = \"none\"; \
+                    } else { \
+                    content.style.display = \"block\"; \
+                    } \
+                }); \
+                } "
         head.append(style)
         html.append(head)
         
         body = etree.Element('body')
+        body.append(script)
         html.append(body)
         
         divGlobal = etree.Element('div', attrib={'class': 'global'})
@@ -360,10 +401,38 @@ class PipelineResultsViewer(object):
                 
                 ElementTreeSVGsource = etree.parse(modelledGlycanSVGPath)
                 ElementSVGsource = ElementTreeSVGsource.getroot()
+                
                 divBetweenPandSVG = etree.Element('div', attrib={'style': 'border-width:1px; padding-top:10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
                 divGlobal.append(divBetweenPandSVG)
+                
                 divSVG = etree.Element('div', attrib={'style': 'float:right; padding-right:10px;'})
                 divSVG.append(ElementSVGsource)
+
+                WURCSParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:400px; font-weight:bold'})
+                WURCSParagraph.text = glycan['WURCS'].text
+                
+                if glycan['GTCID'].text != "Unable to find GlyTouCan ID":
+                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GTCIDParagraph.text = 'GlyTouCan ID: ' + glycan['GTCID'].text
+                else:
+                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GTCIDParagraph.text = 'GlyTouCan ID: Not Found'
+
+                if glycan['GlyConnectID'].text != "Unable to find GlyConnect ID":
+                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GlyConnectIDParagraph.text = 'GlyConnect ID: ' + glycan['GlyConnectID'].text
+                else:
+                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GlyConnectIDParagraph.text = 'GlyConnect ID: Not Found'
+                    # <button type="button" class="collapsible">Open Collapsible</button>
+                    if glycan['Permutations'] is not None:
+                        button = etree.Element('button', attrib={'class': 'folder'})
+                        GlyConnectIDParagraph.append(button)
+                
+                divSVG.append(WURCSParagraph)
+                divSVG.append(GTCIDParagraph)
+                divSVG.append(GlyConnectIDParagraph)
+                
                 divBetweenPandSVG.append(divSVG)
                 divCLEAR = etree.Element('div', attrib={'style': 'clear:both'})
                 divBetweenPandSVG.append(divCLEAR)
@@ -375,7 +444,6 @@ class PipelineResultsViewer(object):
             
         
         body.append(divGlobal)
-        
 
         self.glycanViewHTML = os.path.join(self.directory, 'glycanview.html')
         etree.ElementTree(html).write(self.glycanViewHTML, pretty_print=True, encoding='utf-8',
