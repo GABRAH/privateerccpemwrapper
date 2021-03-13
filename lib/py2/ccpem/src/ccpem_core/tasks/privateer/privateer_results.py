@@ -9,7 +9,7 @@ import collections
 import shutil
 import numpy as np
 import math
-from lxml import etree
+from lxml import etree, html
 from ccpem_core import process_manager
 from ccpem_core import ccpem_utils
 from ccpem_core.ccpem_utils.ccp4_log_parser import smartie
@@ -320,60 +320,18 @@ class PipelineResultsViewer(object):
         head = etree.Element('head')
         
         style = etree.Element('style')
-        style.text = "html { \
-            line-height: 1.6em; \
-            font-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans-Serif; \
-            margin: 10px; \
-            text-align: left; \
-            border-collapse: collapse; \
-            clear: both; } \
-            \
-            \
-            folder { \
-            display:block; \
-            color:#E0000; \
-            text-decoration:none; \
-            margin:3px; \
-            max-width:1000px; \
-            height:1.6em; \
-            padding:1px; \
-            padding-left:10px; \
-            padding-right:10px; \
-            border:2px solid #DDD; \
-            text-align:left; \
-            font-size:125%; \
-            \
-            -moz-border-radius:10px; \
-            -webkit-border-radius:10px; \
-            -o-border-radius:10px; \
-            border-radius:1px; \
-            \
-            background:#CED4D4; \
-            background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#EEE)); \
-            background:-moz-linear-gradient(0% 90% 90deg, #EEE, #FFF); }"
+        style.text = "\nhtml {\n\tline-height: 1.6em;\n\tfont-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans-Serif;\n\tmargin: 10px;\n\ttext-align: left;\n\tborder-collapse: collapse;\n\tclear: both; }\n\nspan.folder {\n\tdisplay:block;\n\ttext-decoration:none;\n\tmargin:3px;\n\tmax-width:1000px;\n\theight:1.6em;\n\tpadding:1px;\n\tpadding-left:10px;\n\tpadding-right:10px;\n\tborder:2px solid #DDD;\n\ttext-align:left;\n\tfont-size:100%;\n\t-webkit-border-radius:10px;\n\tborder-radius:1px;\n\tbackground:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#EEE)); }\n\n.hidesection.hidden {visibility:hidden; width:650px; position:absolute; left:-9000;}\n\n.hidesection.displayed {display: block;}"
+        
         script = etree.Element('script')
-        script.text = " \
-                var coll = document.getElementsByClassName(\"folder\"); \
-                var i; \
-                \
-                for (i = 0; i < coll.length; i++) { \
-                coll[i].addEventListener(\"click\", function() { \
-                    this.classList.toggle(\"active\"); \
-                    var content = this.nextElementSibling; \
-                    if (content.style.display === \"block\") { \
-                    content.style.display = \"none\"; \
-                    } else { \
-                    content.style.display = \"block\"; \
-                    } \
-                }); \
-                } "
+        script.text = "\nfunction toggleview(obj) {\n\tsrc = obj\n\twhile ( (' ' + obj.className +' ').indexOf(' hidesection ') == -1){\n\t\tif      ( obj.nextSibling != null ) obj = obj.nextSibling;\n\t\telse if ( obj.parentNode  != null ) obj = obj.parentNode;\n\t\telse                                return;\n\t}\n\tif ( (' ' + obj.className +' ').indexOf(' displayed ') > -1 ) {\n\t\t$(obj).slideUp(300,function(){obj.className = obj.className.replace( 'displayed' , 'hidden' );})\n\t\t//src.childNodes[0].nodeValue = src.childNodes[0].nodeValue.replace( \"\u25BC\", \"\u25B6\" );\n\n\t} else if ( (' ' + obj.className +' ').indexOf(' hidden ') > -1 )  {\n\t\t$(obj).slideDown(300,function(){obj.className = obj.className.replace( 'hidden' , 'displayed' );})\n\t\t//src.childNodes[0].nodeValue = src.childNodes[0].nodeValue.replace( \"\u25B6\", \"\u25BC\" );\n\t}\n}\n" 
+        
         head.append(style)
         html.append(head)
         
         body = etree.Element('body')
-        body.append(script)
+        etree.tostring(script, method='html')
         html.append(body)
-        
+
         divGlobal = etree.Element('div', attrib={'class': 'global'})
         explanationParagraph = etree.Element('p')
         explanationParagraph.text = "Below are graphical plots of the detected glycan trees. Placing your mouse pointer over any of the sugars will display a tooltip containing its residue name and number from the PDB file."
@@ -410,28 +368,36 @@ class PipelineResultsViewer(object):
 
                 WURCSParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:400px; font-weight:bold'})
                 WURCSParagraph.text = glycan['WURCS'].text
-                
+                divSVG.append(WURCSParagraph)
+
                 if glycan['GTCID'].text != "Unable to find GlyTouCan ID":
                     GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GTCIDParagraph.text = 'GlyTouCan ID: ' + glycan['GTCID'].text
+                    # divSVG.append(GTCIDParagraph)
                 else:
                     GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GTCIDParagraph.text = 'GlyTouCan ID: Not Found'
+                    # divSVG.append(GTCIDParagraph)
 
                 if glycan['GlyConnectID'].text != "Unable to find GlyConnect ID":
                     GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: ' + glycan['GlyConnectID'].text
+                    # divSVG.append(GlyConnectIDParagraph)
                 else:
                     GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: Not Found'
-                    # <button type="button" class="collapsible">Open Collapsible</button>
+                    # divSVG.append(GlyConnectIDParagraph)
                     if glycan['Permutations'] is not None:
-                        button = etree.Element('button', attrib={'class': 'folder'})
-                        GlyConnectIDParagraph.append(button)
+                        aElement = etree.Element('a', attrib={'id': 'Closest permutations detected on GlyConnect database'})
+                        # divSVG.append(aElement)
+                        spanFolder = etree.Element('span', attrib={'class': 'folder', 'onclick': 'toggleview(this)'})
+                        spanFolder.text = "Closest permutations detected on GlyConnect database"
+                        # divSVG.append(spanFolder)
+                        sectionDiv = etree.Element('div', attrib={'class': 'hidesection hidden'})
+                        sectionDivStyle = etree.Element('div', attrib={'style': 'border-width: 1px; padding-top: 10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
+                        # sectionDiv.append(sectionDivStyle)
+                        # divSVG.append(sectionDiv)
                 
-                divSVG.append(WURCSParagraph)
-                divSVG.append(GTCIDParagraph)
-                divSVG.append(GlyConnectIDParagraph)
                 
                 divBetweenPandSVG.append(divSVG)
                 divCLEAR = etree.Element('div', attrib={'style': 'clear:both'})
@@ -444,13 +410,16 @@ class PipelineResultsViewer(object):
             
         
         body.append(divGlobal)
-
+        # body.append(script)
         self.glycanViewHTML = os.path.join(self.directory, 'glycanview.html')
         etree.ElementTree(html).write(self.glycanViewHTML, pretty_print=True, encoding='utf-8',
                              method='html')
-        glycanViewHACK = etree.parse(self.glycanViewHTML) 
-        finalHTMLoutput = etree.tostring(glycanViewHACK, pretty_print=True)
-        # print(finalHTMLoutput)
+        parser = etree.HTMLParser()
+        glycanViewHACK = etree.parse(self.glycanViewHTML, parser)
+
+        finalHTMLoutput = etree.tostring(glycanViewHACK,
+                        pretty_print=True, method="html")
+
         return finalHTMLoutput
 
 
