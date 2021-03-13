@@ -288,9 +288,10 @@ class PipelineResultsViewer(object):
                     list_of_permutations = []
                     for permutation in permutations:
                         i_permutation_dict = collections.OrderedDict()
-                        i_permutation_dict['PermutationsWURCS'] = permutation.find('PermutationsWURCS')
-                        i_permutation_dict['PermutationsScore'] = permutation.find('PermutationsScore')
+                        i_permutation_dict['PermutationWURCS'] = permutation.find('PermutationWURCS')
+                        i_permutation_dict['PermutationScore'] = permutation.find('PermutationScore')
                         i_permutation_dict['anomerPermutations'] = permutation.find('anomerPermutations')
+                        i_permutation_dict['residuePermutations'] = permutation.find('residuePermutations')
                         i_permutation_dict['residuePermutations'] = permutation.find('residuePermutations')
                         i_permutation_dict['residueDeletions'] = permutation.find('residueDeletions')
                         i_permutation_dict['PermutationGTCID'] = permutation.find('PermutationGTCID')
@@ -373,30 +374,83 @@ class PipelineResultsViewer(object):
                 if glycan['GTCID'].text != "Unable to find GlyTouCan ID":
                     GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GTCIDParagraph.text = 'GlyTouCan ID: ' + glycan['GTCID'].text
-                    # divSVG.append(GTCIDParagraph)
+                    divSVG.append(GTCIDParagraph)
                 else:
                     GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GTCIDParagraph.text = 'GlyTouCan ID: Not Found'
-                    # divSVG.append(GTCIDParagraph)
+                    divSVG.append(GTCIDParagraph)
 
                 if glycan['GlyConnectID'].text != "Unable to find GlyConnect ID":
                     GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: ' + glycan['GlyConnectID'].text
-                    # divSVG.append(GlyConnectIDParagraph)
+                    divSVG.append(GlyConnectIDParagraph)
                 else:
                     GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: Not Found'
-                    # divSVG.append(GlyConnectIDParagraph)
+                    divSVG.append(GlyConnectIDParagraph)
                     if glycan['Permutations'] is not None:
                         aElement = etree.Element('a', attrib={'id': 'Closest permutations detected on GlyConnect database'})
-                        # divSVG.append(aElement)
+                        divSVG.append(aElement)
                         spanFolder = etree.Element('span', attrib={'class': 'folder', 'onclick': 'toggleview(this)'})
                         spanFolder.text = "Closest permutations detected on GlyConnect database"
-                        # divSVG.append(spanFolder)
+                        divSVG.append(spanFolder)
                         sectionDiv = etree.Element('div', attrib={'class': 'hidesection hidden'})
                         sectionDivStyle = etree.Element('div', attrib={'style': 'border-width: 1px; padding-top: 10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
-                        # sectionDiv.append(sectionDivStyle)
-                        # divSVG.append(sectionDiv)
+                        permutationList = glycan['Permutations']
+
+                        for permutation in permutationList:
+                            permutationGlycanSVGName = permutation['PermutationSVG'].text
+                            permutationGlycanSVGPath = os.path.join(self.job_location, permutationGlycanSVGName)
+                            if os.path.isfile(permutationGlycanSVGPath):
+                                svg_file_permutation = open(permutationGlycanSVGPath, 'r')
+                                svg_string = svg_file_permutation.read()
+                                svg_file_permutation.close()
+
+                                svg_string_partitioned_permutation = svg_string.partition("width=\"")
+                                svg_width_permutation = ''
+                                for symbol in svg_string_partitioned[2]:
+                                    if symbol != "\"":
+                                        svg_width_permutation = svg_width_permutation + symbol
+                                    else:
+                                        break
+                                
+                                permutationElementTreeSVGsource = etree.parse(permutationGlycanSVGPath)
+                                permutationElementSVGsource = permutationElementTreeSVGsource.getroot()
+                                sectionDivStyle.append(permutationElementSVGsource)
+                                
+                                WURCSParagraphPermutation = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+                                WURCSParagraphPermutation.text = permutation['PermutationWURCS'].text
+                                sectionDivStyle.append(WURCSParagraphPermutation)
+                                
+                                PermutationScore = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+                                PermutationScore.text = 'Permutation Score(out of 100): ' + permutation['PermutationScore'].text
+                                sectionDivStyle.append(PermutationScore)
+
+                                anomerPermutations = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+                                anomerPermutations.text = 'Anomer Permutations: ' + permutation['anomerPermutations'].text
+                                sectionDivStyle.append(anomerPermutations)
+
+                                residuePermutations = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+                                residuePermutations.text = 'Residue Permutations: ' + permutation['residuePermutations'].text
+                                sectionDivStyle.append(residuePermutations)
+
+                                residueDeletions = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+                                residueDeletions.text = 'Residue Deletions: ' + permutation['residueDeletions'].text
+                                sectionDivStyle.append(residueDeletions)
+
+                                PermutationGTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                                PermutationGTCIDParagraph.text = 'GlyTouCan ID: ' + permutation['PermutationGTCID'].text
+                                sectionDivStyle.append(PermutationGTCIDParagraph)
+
+                                PermutationGlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                                PermutationGlyConnectIDParagraph.text = 'Glyconnect ID: ' + permutation['PermutationGlyConnectID'].text
+                                sectionDivStyle.append(PermutationGlyConnectIDParagraph)
+                                
+                                divSeperator = etree.Element('div', attrib={'style': 'float:right; padding-right:10px; '})
+                                sectionDivStyle.append(divSeperator)
+                        
+                        sectionDiv.append(sectionDivStyle)
+                        divSVG.append(sectionDiv)
                 
                 
                 divBetweenPandSVG.append(divSVG)
@@ -410,7 +464,7 @@ class PipelineResultsViewer(object):
             
         
         body.append(divGlobal)
-        # body.append(script)
+        body.append(script)
         self.glycanViewHTML = os.path.join(self.directory, 'glycanview.html')
         etree.ElementTree(html).write(self.glycanViewHTML, pretty_print=True, encoding='utf-8',
                              method='html')
