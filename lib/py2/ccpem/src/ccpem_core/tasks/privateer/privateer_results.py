@@ -20,7 +20,7 @@ import pyrvapi_ext as API
 # ProSmart and DockEM are examples to use.
 # https://stackoverflow.com/questions/17196370/how-to-place-qwebview-in-qtabwidget
 
-class PipelineResultsViewer(object):
+class PrivateerResultsViewer(object):
     # class ResultViewer(object):
     '''
     Get Privateer results from program.xml
@@ -222,99 +222,99 @@ class PipelineResultsViewer(object):
         Make <B-Factor> vs Real Space CC 
         '''
         # make graph widget
-        pyranoses = validationdata['Pyranoses']
+        if "Pyranoses" in validationdata:
+            pyranoses = validationdata["Pyranoses"]
+
+            low_energy_pyranoses   = []
+            high_energy_pyranoses  = []
+            other_issues_pyranoses = []
+
+            for pyranose in pyranoses:
+                if "conformation" in pyranose["Diagnostic"].text.lower() :
+                    high_energy_pyranoses.append ( pyranose )
+                elif "Ok" in pyranose["Diagnostic"].text:
+                    low_energy_pyranoses.append ( pyranose )
+                else : other_issues_pyranoses.append ( pyranose )
+
+            graphWid1 = API.loggraph(results_tab)
+            brdata = API.graph_data(graphWid1, 'Summary of detected pyranoses')
+            dx_ok_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
+            dy_ok_Alpha = API.graph_dataset(brdata, 'OK', 'y1', isint=False)
+            dx_conformation_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
+            dy_conformation_Alpha = API.graph_dataset(brdata, 'Conformation might be mistaken', 'y2', isint=False)
+            dx_other_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
+            dy_other_Alpha = API.graph_dataset(brdata, 'Other Issues', 'y3', isint=False)
+
+            ycol_Alpha = 'Theta'
+            xcol_Alpha = 'Phi'
+            yaxlabel_Alpha = 'Theta'
+            xmax_ok_Alpha = len(low_energy_pyranoses)
+            xmax_conformation_Alpha = len(high_energy_pyranoses)
+            xmax_other_Alpha = len(other_issues_pyranoses)
+            for i in range(0, xmax_ok_Alpha):
+                dx_ok_Alpha.add_datum(float(low_energy_pyranoses[i][xcol_Alpha].text))
+                dy_ok_Alpha.add_datum(float(low_energy_pyranoses[i][ycol_Alpha].text))
+            for i in range(0, xmax_conformation_Alpha):
+                dx_conformation_Alpha.add_datum(float(high_energy_pyranoses[i][xcol_Alpha].text))
+                dy_conformation_Alpha.add_datum(float(high_energy_pyranoses[i][ycol_Alpha].text))
+            for i in range(0, xmax_other_Alpha):
+                dx_other_Alpha.add_datum(float(other_issues_pyranoses[i][xcol_Alpha].text))
+                dy_other_Alpha.add_datum(float(other_issues_pyranoses[i][ycol_Alpha].text))
+            plotAlpha = API.graph_plot(graphWid1, "Conformational landscape for pyranoses", xcol_Alpha, yaxlabel_Alpha)
+            plotAlpha.reset_xticks()
+            plotAlpha.reset_yticks()
+            for i in range(360, -1, -30):
+                plotAlpha.add_xtick(i, '%d' % (i))
+            for i in range(180, -1, -45):
+                plotAlpha.add_ytick(i, '%d' % (i))
+            dx_y_OK_Alpha = API.plot_line(plotAlpha, brdata, dx_ok_Alpha, dy_ok_Alpha)
+            dx_y_OK_Alpha.set_options(color='olivedrab', marker='.', style=API.LINE_Off, width=1.0)
+            dx_y_CONFORMATION_Alpha = API.plot_line(plotAlpha, brdata, dx_conformation_Alpha, dy_conformation_Alpha)
+            dx_y_CONFORMATION_Alpha.set_options(color='red', marker='x', style=API.LINE_Off, width=2.0)
+            dx_y_OTHER_Alpha = API.plot_line(plotAlpha, brdata, dx_other_Alpha, dy_other_Alpha)
+            dx_y_OTHER_Alpha.set_options(color='orange', marker='o', style=API.LINE_Off, width=2.5)
+            plotAlpha.set_legend('s', 'outsideGrid')
 
 
-        low_energy_pyranoses   = []
-        high_energy_pyranoses  = []
-        other_issues_pyranoses = []
+            dx_ok_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
+            dy_ok_Bravo = API.graph_dataset(brdata, 'OK', 'y1', isint=False)
+            dx_conformation_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
+            dy_conformation_Bravo = API.graph_dataset(brdata, 'Conformation might be mistaken', 'y2', isint=False)
+            dx_other_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
+            dy_other_Bravo = API.graph_dataset(brdata, 'Other Issues', 'y3', isint=False)
 
-        for pyranose in pyranoses:
-            if "conformation" in pyranose["Diagnostic"].text.lower() :
-                high_energy_pyranoses.append ( pyranose )
-            elif "Ok" in pyranose["Diagnostic"].text:
-                low_energy_pyranoses.append ( pyranose )
-            else : other_issues_pyranoses.append ( pyranose )
-
-        graphWid1 = API.loggraph(results_tab)
-        brdata = API.graph_data(graphWid1, 'Summary of detected pyranoses')
-        dx_ok_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
-        dy_ok_Alpha = API.graph_dataset(brdata, 'OK', 'y1', isint=False)
-        dx_conformation_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
-        dy_conformation_Alpha = API.graph_dataset(brdata, 'Conformation might be mistaken', 'y2', isint=False)
-        dx_other_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
-        dy_other_Alpha = API.graph_dataset(brdata, 'Other Issues', 'y3', isint=False)
-
-        ycol_Alpha = 'Theta'
-        xcol_Alpha = 'Phi'
-        yaxlabel_Alpha = 'Theta'
-        xmax_ok_Alpha = len(low_energy_pyranoses)
-        xmax_conformation_Alpha = len(high_energy_pyranoses)
-        xmax_other_Alpha = len(other_issues_pyranoses)
-        for i in range(0, xmax_ok_Alpha):
-            dx_ok_Alpha.add_datum(float(low_energy_pyranoses[i][xcol_Alpha].text))
-            dy_ok_Alpha.add_datum(float(low_energy_pyranoses[i][ycol_Alpha].text))
-        for i in range(0, xmax_conformation_Alpha):
-            dx_conformation_Alpha.add_datum(float(high_energy_pyranoses[i][xcol_Alpha].text))
-            dy_conformation_Alpha.add_datum(float(high_energy_pyranoses[i][ycol_Alpha].text))
-        for i in range(0, xmax_other_Alpha):
-            dx_other_Alpha.add_datum(float(other_issues_pyranoses[i][xcol_Alpha].text))
-            dy_other_Alpha.add_datum(float(other_issues_pyranoses[i][ycol_Alpha].text))
-        plotAlpha = API.graph_plot(graphWid1, "Conformational landscape for pyranoses", xcol_Alpha, yaxlabel_Alpha)
-        plotAlpha.reset_xticks()
-        plotAlpha.reset_yticks()
-        for i in range(360, -1, -30):
-            plotAlpha.add_xtick(i, '%d' % (i))
-        for i in range(180, -1, -45):
-            plotAlpha.add_ytick(i, '%d' % (i))
-        dx_y_OK_Alpha = API.plot_line(plotAlpha, brdata, dx_ok_Alpha, dy_ok_Alpha)
-        dx_y_OK_Alpha.set_options(color='olivedrab', marker='.', style=API.LINE_Off, width=1.0)
-        dx_y_CONFORMATION_Alpha = API.plot_line(plotAlpha, brdata, dx_conformation_Alpha, dy_conformation_Alpha)
-        dx_y_CONFORMATION_Alpha.set_options(color='red', marker='x', style=API.LINE_Off, width=2.0)
-        dx_y_OTHER_Alpha = API.plot_line(plotAlpha, brdata, dx_other_Alpha, dy_other_Alpha)
-        dx_y_OTHER_Alpha.set_options(color='orange', marker='o', style=API.LINE_Off, width=2.5)
-        plotAlpha.set_legend('s', 'outsideGrid')
-
-
-        dx_ok_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
-        dy_ok_Bravo = API.graph_dataset(brdata, 'OK', 'y1', isint=False)
-        dx_conformation_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
-        dy_conformation_Bravo = API.graph_dataset(brdata, 'Conformation might be mistaken', 'y2', isint=False)
-        dx_other_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
-        dy_other_Bravo = API.graph_dataset(brdata, 'Other Issues', 'y3', isint=False)
-
-        ycol_Bravo = 'RSCC'
-        xcol_Bravo = 'BFactor'
-        yaxlabel_Bravo = 'Real Space CC'
-        xaxlabel_Bravo = 'Isotropic B-Factor'
-        xmax_ok_Bravo = len(low_energy_pyranoses)
-        xmax_conformation_Bravo = len(high_energy_pyranoses)
-        xmax_other_Bravo = len(other_issues_pyranoses)
-        for i in range(0, xmax_ok_Bravo):
-            dx_ok_Bravo.add_datum(float(low_energy_pyranoses[i][xcol_Bravo].text))
-            dy_ok_Bravo.add_datum(float(low_energy_pyranoses[i][ycol_Bravo].text))
-        for i in range(0, xmax_conformation_Bravo):
-            dx_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][xcol_Bravo].text))
-            dy_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][ycol_Bravo].text))
-        for i in range(0, xmax_other_Bravo):
-            dx_other_Bravo.add_datum(float(other_issues_pyranoses[i][xcol_Bravo].text))
-            dy_other_Bravo.add_datum(float(other_issues_pyranoses[i][ycol_Bravo].text))
-        plotBravo = API.graph_plot(graphWid1, "BFactor vs RSCC", xaxlabel_Bravo, yaxlabel_Bravo)
-        plotBravo.reset_xticks()
-        plotBravo.reset_yticks()
-        yticks = [0.0, 0.5, 0.7, 1.0]
-        for i in range(0, 101, 20):
-            plotBravo.add_xtick(i, '%d' % (i))
-        for i in yticks:
-            plotBravo.add_ytick(i, '%.1f' % (i))
-        dx_y_OK_Bravo = API.plot_line(plotBravo, brdata, dx_ok_Bravo, dy_ok_Bravo)
-        dx_y_OK_Bravo.set_options(color='olivedrab', marker='.', style=API.LINE_Off, width=1.0)
-        dx_y_CONFORMATION_Bravo = API.plot_line(plotBravo, brdata, dx_conformation_Bravo, dy_conformation_Bravo)
-        dx_y_CONFORMATION_Bravo.set_options(color='red', marker='x', style=API.LINE_Off, width=2.0)
-        dx_y_OTHER_Bravo = API.plot_line(plotBravo, brdata, dx_other_Bravo, dy_other_Bravo)
-        dx_y_OTHER_Bravo.set_options(color='orange', marker='o', style=API.LINE_Off, width=2.5)
-        plotBravo.set_legend('s', 'outsideGrid')
-        API.flush()
+            ycol_Bravo = 'RSCC'
+            xcol_Bravo = 'BFactor'
+            yaxlabel_Bravo = 'Real Space CC'
+            xaxlabel_Bravo = 'Isotropic B-Factor'
+            xmax_ok_Bravo = len(low_energy_pyranoses)
+            xmax_conformation_Bravo = len(high_energy_pyranoses)
+            xmax_other_Bravo = len(other_issues_pyranoses)
+            for i in range(0, xmax_ok_Bravo):
+                dx_ok_Bravo.add_datum(float(low_energy_pyranoses[i][xcol_Bravo].text))
+                dy_ok_Bravo.add_datum(float(low_energy_pyranoses[i][ycol_Bravo].text))
+            for i in range(0, xmax_conformation_Bravo):
+                dx_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][xcol_Bravo].text))
+                dy_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][ycol_Bravo].text))
+            for i in range(0, xmax_other_Bravo):
+                dx_other_Bravo.add_datum(float(other_issues_pyranoses[i][xcol_Bravo].text))
+                dy_other_Bravo.add_datum(float(other_issues_pyranoses[i][ycol_Bravo].text))
+            plotBravo = API.graph_plot(graphWid1, "BFactor vs RSCC", xaxlabel_Bravo, yaxlabel_Bravo)
+            plotBravo.reset_xticks()
+            plotBravo.reset_yticks()
+            yticks = [0.0, 0.5, 0.7, 1.0]
+            for i in range(0, 101, 20):
+                plotBravo.add_xtick(i, '%d' % (i))
+            for i in yticks:
+                plotBravo.add_ytick(i, '%.1f' % (i))
+            dx_y_OK_Bravo = API.plot_line(plotBravo, brdata, dx_ok_Bravo, dy_ok_Bravo)
+            dx_y_OK_Bravo.set_options(color='olivedrab', marker='.', style=API.LINE_Off, width=1.0)
+            dx_y_CONFORMATION_Bravo = API.plot_line(plotBravo, brdata, dx_conformation_Bravo, dy_conformation_Bravo)
+            dx_y_CONFORMATION_Bravo.set_options(color='red', marker='x', style=API.LINE_Off, width=2.0)
+            dx_y_OTHER_Bravo = API.plot_line(plotBravo, brdata, dx_other_Bravo, dy_other_Bravo)
+            dx_y_OTHER_Bravo.set_options(color='orange', marker='o', style=API.LINE_Off, width=2.5)
+            plotBravo.set_legend('s', 'outsideGrid')
+            API.flush()
 
     def display_glycan_chains(self, results_tab, xmlfilename):
         tree = etree.parse(xmlfilename)  # self.xmlfilename)
@@ -571,7 +571,6 @@ def main(target_dir=None):
         # pl_dir = '/home/harold/ccpem_project/Privateer_22' # permutation-less
     else:
         pl_dir = target_dir
-    # job_location = pl_dir + '/task.ccpem'
     job_location = pl_dir
     rvapi_dir = pl_dir + '/report'
     if os.path.exists(rvapi_dir):
@@ -585,7 +584,7 @@ def main(target_dir=None):
     ccpem_utils.check_directory_and_make(rvapi_dir)
     os.chdir(pl_dir)
     if os.path.exists(job_location):
-        rv = PipelineResultsViewer(job_location=job_location)
+        rv = PrivateerResultsViewer(job_location=job_location)
         web_window.load(QtCore.QUrl(rv.index))
         app.exec_()
 

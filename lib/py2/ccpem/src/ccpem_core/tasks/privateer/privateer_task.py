@@ -394,20 +394,21 @@ class Privateer(task_utils.CCPEMTask):
         pl = [[pr.process]]
 
         custom_finish = PrivateerResultsOnFinish(
-            pipeline_path=self.job_location + '/task.ccpem')
+            job_location=self.job_location)
 
         # Run pipeline
+        os.chdir(self.job_location)
         self.pipeline = process_manager.CCPEMPipeline (
-                           pipeline           = pl,
-                           job_id             = job_id,
-                           args_path          = self.args.jsonfile,
-                           location           = self.job_location,
-                           database_path      = self.database_path,
-                           db_inject          = db_inject,
-                           taskname           = self.task_info.name,
-                           title              = self.args.job_title.value,
-                           verbose            = self.verbose,
-                           on_finish_custom   = None )
+                        pipeline           = pl,
+                        job_id             = job_id,
+                        args_path          = self.args.jsonfile,
+                        location           = self.job_location,
+                        database_path      = self.database_path,
+                        db_inject          = db_inject,
+                        taskname           = self.task_info.name,
+                        title              = self.args.job_title.value,
+                        verbose            = self.verbose,
+                        on_finish_custom   = custom_finish )
         self.pipeline.start()
 
 
@@ -717,5 +718,5 @@ class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
 
     def on_finish(self, parent_pipeline=None):
         # generate RVAPI report
-        privateer_results.PipelineResultsViewer(
+        privateer_results.PrivateerResultsViewer(
             job_location=self.job_location)
