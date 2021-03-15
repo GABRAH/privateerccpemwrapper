@@ -365,28 +365,28 @@ class PipelineResultsViewer(object):
                 divBetweenPandSVG = etree.Element('div', attrib={'style': 'border-width:1px; padding-top:10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
                 divGlobal.append(divBetweenPandSVG)
                 
-                divSVG = etree.Element('div', attrib={'style': 'float:right; padding-right:10px;'})
+                divSVG = etree.Element('div', attrib={'style': 'padding:10px;'})
                 divSVG.append(ElementSVGsource)
 
-                WURCSParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:400px; font-weight:bold'})
+                WURCSParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                 WURCSParagraph.text = glycan['WURCS'].text
                 divSVG.append(WURCSParagraph)
 
                 if glycan['GTCID'].text != "Unable to find GlyTouCan ID":
-                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                     GTCIDParagraph.text = 'GlyTouCan ID: ' + glycan['GTCID'].text
                     divSVG.append(GTCIDParagraph)
                 else:
-                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                     GTCIDParagraph.text = 'GlyTouCan ID: Not Found'
                     divSVG.append(GTCIDParagraph)
 
                 if glycan['GlyConnectID'].text != "Unable to find GlyConnect ID":
-                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: ' + glycan['GlyConnectID'].text
                     divSVG.append(GlyConnectIDParagraph)
                 else:
-                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: Not Found'
                     divSVG.append(GlyConnectIDParagraph)
                     if glycan['Permutations'] is not None:
@@ -398,6 +398,7 @@ class PipelineResultsViewer(object):
                         permutationList = glycan['Permutations']
 
                         for permutation in permutationList:
+                            permutationDivBorder = etree.Element('div', attrib={'style': 'border-width: 1px; padding-top: 10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
                             permutationGlycanSVGName = permutation['PermutationSVG'].text
                             permutationGlycanSVGPath = os.path.join(self.job_location, permutationGlycanSVGName)
                             if os.path.isfile(permutationGlycanSVGPath):
@@ -415,38 +416,47 @@ class PipelineResultsViewer(object):
                                 
                                 permutationElementTreeSVGsource = etree.parse(permutationGlycanSVGPath)
                                 permutationElementSVGsource = permutationElementTreeSVGsource.getroot()
-                                sectionDivStyle.append(permutationElementSVGsource)
+                                permutationDivBorder.append(permutationElementSVGsource)
+
                                 
-                                WURCSParagraphPermutation = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+                                WURCSParagraphPermutation = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                                 WURCSParagraphPermutation.text = permutation['PermutationWURCS'].text
-                                sectionDivStyle.append(WURCSParagraphPermutation)
+                                permutationDivBorder.append(WURCSParagraphPermutation)
+
                                 
-                                PermutationScore = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+                                PermutationScore = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                                 PermutationScore.text = 'Permutation Score(out of 100): ' + permutation['PermutationScore'].text
-                                sectionDivStyle.append(PermutationScore)
+                                permutationDivBorder.append(PermutationScore)
 
-                                anomerPermutations = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+
+                                anomerPermutations = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                                 anomerPermutations.text = 'Anomer Permutations: ' + permutation['anomerPermutations'].text
-                                sectionDivStyle.append(anomerPermutations)
+                                permutationDivBorder.append(anomerPermutations)
 
-                                residuePermutations = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+
+                                residuePermutations = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                                 residuePermutations.text = 'Residue Permutations: ' + permutation['residuePermutations'].text
-                                sectionDivStyle.append(residuePermutations)
+                                permutationDivBorder.append(residuePermutations)
 
-                                residueDeletions = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width_permutation + 'px; font-weight:bold'})
+
+                                residueDeletions = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                                 residueDeletions.text = 'Residue Deletions: ' + permutation['residueDeletions'].text
-                                sectionDivStyle.append(residueDeletions)
+                                permutationDivBorder.append(residueDeletions)
 
-                                PermutationGTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+
+                                PermutationGTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                                 PermutationGTCIDParagraph.text = 'GlyTouCan ID: ' + permutation['PermutationGTCID'].text
-                                sectionDivStyle.append(PermutationGTCIDParagraph)
+                                permutationDivBorder.append(PermutationGTCIDParagraph)
 
-                                PermutationGlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; max-width:' + svg_width + 'px; font-weight:bold'})
+
+                                PermutationGlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
                                 PermutationGlyConnectIDParagraph.text = 'Glyconnect ID: ' + permutation['PermutationGlyConnectID'].text
-                                sectionDivStyle.append(PermutationGlyConnectIDParagraph)
+                                permutationDivBorder.append(PermutationGlyConnectIDParagraph)
+
                                 
-                                divSeperator = etree.Element('div', attrib={'style': 'float:right; padding-right:10px; '})
-                                sectionDivStyle.append(divSeperator)
+                                divSeperator = etree.Element('div', attrib={'style': 'padding:10px; '})
+                                permutationDivBorder.append(divSeperator)
+                                sectionDivStyle.append(permutationDivBorder)
                         
                         sectionDiv.append(sectionDivStyle)
                         divSVG.append(sectionDiv)
