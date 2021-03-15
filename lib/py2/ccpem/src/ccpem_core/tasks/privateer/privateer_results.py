@@ -224,17 +224,42 @@ class PipelineResultsViewer(object):
         # make graph widget
         pyranoses = validationdata['Pyranoses']
 
+
+        low_energy_pyranoses   = []
+        high_energy_pyranoses  = []
+        other_issues_pyranoses = []
+
+        for pyranose in pyranoses:
+            if "conformation" in pyranose["Diagnostic"].text.lower() :
+                high_energy_pyranoses.append ( pyranose )
+            elif "Ok" in pyranose["Diagnostic"].text:
+                low_energy_pyranoses.append ( pyranose )
+            else : other_issues_pyranoses.append ( pyranose )
+
         graphWid1 = API.loggraph(results_tab)
         brdata = API.graph_data(graphWid1, 'Summary of detected pyranoses')
-        dx_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
-        dy_Alpha = API.graph_dataset(brdata, 'Sugar', 'y1', isint=False)
+        dx_ok_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
+        dy_ok_Alpha = API.graph_dataset(brdata, 'OK', 'y1', isint=False)
+        dx_conformation_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
+        dy_conformation_Alpha = API.graph_dataset(brdata, 'Conformation might be mistaken', 'y2', isint=False)
+        dx_other_Alpha = API.graph_dataset(brdata, 'Phi', 'Phi', isint=False)
+        dy_other_Alpha = API.graph_dataset(brdata, 'Other Issues', 'y3', isint=False)
+
         ycol_Alpha = 'Theta'
         xcol_Alpha = 'Phi'
         yaxlabel_Alpha = 'Theta'
-        xmax_Alpha = len(pyranoses)
-        for i in range(0, xmax_Alpha):
-            dx_Alpha.add_datum(float(pyranoses[i][xcol_Alpha].text))
-            dy_Alpha.add_datum(float(pyranoses[i][ycol_Alpha].text))
+        xmax_ok_Alpha = len(low_energy_pyranoses)
+        xmax_conformation_Alpha = len(high_energy_pyranoses)
+        xmax_other_Alpha = len(other_issues_pyranoses)
+        for i in range(0, xmax_ok_Alpha):
+            dx_ok_Alpha.add_datum(float(low_energy_pyranoses[i][xcol_Alpha].text))
+            dy_ok_Alpha.add_datum(float(low_energy_pyranoses[i][ycol_Alpha].text))
+        for i in range(0, xmax_conformation_Alpha):
+            dx_conformation_Alpha.add_datum(float(high_energy_pyranoses[i][xcol_Alpha].text))
+            dy_conformation_Alpha.add_datum(float(high_energy_pyranoses[i][ycol_Alpha].text))
+        for i in range(0, xmax_other_Alpha):
+            dx_other_Alpha.add_datum(float(other_issues_pyranoses[i][xcol_Alpha].text))
+            dy_other_Alpha.add_datum(float(other_issues_pyranoses[i][ycol_Alpha].text))
         plotAlpha = API.graph_plot(graphWid1, "Conformational landscape for pyranoses", xcol_Alpha, yaxlabel_Alpha)
         plotAlpha.reset_xticks()
         plotAlpha.reset_yticks()
@@ -242,19 +267,38 @@ class PipelineResultsViewer(object):
             plotAlpha.add_xtick(i, '%d' % (i))
         for i in range(180, -1, -45):
             plotAlpha.add_ytick(i, '%d' % (i))
-        dx_y_Alpha = API.plot_line(plotAlpha, brdata, dx_Alpha, dy_Alpha)
-        dx_y_Alpha.set_options(color='black', style=API.LINE_Off, width=1.0)
+        dx_y_OK_Alpha = API.plot_line(plotAlpha, brdata, dx_ok_Alpha, dy_ok_Alpha)
+        dx_y_OK_Alpha.set_options(color='olivedrab', marker='.', style=API.LINE_Off, width=1.0)
+        dx_y_CONFORMATION_Alpha = API.plot_line(plotAlpha, brdata, dx_conformation_Alpha, dy_conformation_Alpha)
+        dx_y_CONFORMATION_Alpha.set_options(color='red', marker='x', style=API.LINE_Off, width=2.0)
+        dx_y_OTHER_Alpha = API.plot_line(plotAlpha, brdata, dx_other_Alpha, dy_other_Alpha)
+        dx_y_OTHER_Alpha.set_options(color='orange', marker='o', style=API.LINE_Off, width=2.5)
+        plotAlpha.set_legend('s', 'outsideGrid')
 
-        dx_Bravo = API.graph_dataset(brdata, 'Isotropic B-Factor', 'Isotropic B-Factor', isint=False)
-        dy_Bravo = API.graph_dataset(brdata, 'Sugar', 'y1', isint=False)
+
+        dx_ok_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
+        dy_ok_Bravo = API.graph_dataset(brdata, 'OK', 'y1', isint=False)
+        dx_conformation_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
+        dy_conformation_Bravo = API.graph_dataset(brdata, 'Conformation might be mistaken', 'y2', isint=False)
+        dx_other_Bravo = API.graph_dataset(brdata, 'BFactor', 'BFactor', isint=False)
+        dy_other_Bravo = API.graph_dataset(brdata, 'Other Issues', 'y3', isint=False)
+
         ycol_Bravo = 'RSCC'
         xcol_Bravo = 'BFactor'
         yaxlabel_Bravo = 'Real Space CC'
         xaxlabel_Bravo = 'Isotropic B-Factor'
-        xmax_Bravo = len(pyranoses)
-        for i in range(0, xmax_Bravo):
-            dx_Bravo.add_datum(float(pyranoses[i][xcol_Bravo].text))
-            dy_Bravo.add_datum(float(pyranoses[i][ycol_Bravo].text))
+        xmax_ok_Bravo = len(low_energy_pyranoses)
+        xmax_conformation_Bravo = len(high_energy_pyranoses)
+        xmax_other_Bravo = len(other_issues_pyranoses)
+        for i in range(0, xmax_ok_Bravo):
+            dx_ok_Bravo.add_datum(float(low_energy_pyranoses[i][xcol_Bravo].text))
+            dy_ok_Bravo.add_datum(float(low_energy_pyranoses[i][ycol_Bravo].text))
+        for i in range(0, xmax_conformation_Bravo):
+            dx_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][xcol_Bravo].text))
+            dy_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][ycol_Bravo].text))
+        for i in range(0, xmax_other_Bravo):
+            dx_other_Bravo.add_datum(float(other_issues_pyranoses[i][xcol_Bravo].text))
+            dy_other_Bravo.add_datum(float(other_issues_pyranoses[i][ycol_Bravo].text))
         plotBravo = API.graph_plot(graphWid1, "BFactor vs RSCC", xaxlabel_Bravo, yaxlabel_Bravo)
         plotBravo.reset_xticks()
         plotBravo.reset_yticks()
@@ -263,8 +307,13 @@ class PipelineResultsViewer(object):
             plotBravo.add_xtick(i, '%d' % (i))
         for i in yticks:
             plotBravo.add_ytick(i, '%.1f' % (i))
-        dx_y_Bravo = API.plot_line(plotBravo, brdata, dx_Bravo, dy_Bravo)
-        dx_y_Bravo.set_options(color='black', style=API.LINE_Off, width=1.0)
+        dx_y_OK_Bravo = API.plot_line(plotBravo, brdata, dx_ok_Bravo, dy_ok_Bravo)
+        dx_y_OK_Bravo.set_options(color='olivedrab', marker='.', style=API.LINE_Off, width=1.0)
+        dx_y_CONFORMATION_Bravo = API.plot_line(plotBravo, brdata, dx_conformation_Bravo, dy_conformation_Bravo)
+        dx_y_CONFORMATION_Bravo.set_options(color='red', marker='x', style=API.LINE_Off, width=2.0)
+        dx_y_OTHER_Bravo = API.plot_line(plotBravo, brdata, dx_other_Bravo, dy_other_Bravo)
+        dx_y_OTHER_Bravo.set_options(color='orange', marker='o', style=API.LINE_Off, width=2.5)
+        plotBravo.set_legend('s', 'outsideGrid')
         API.flush()
 
     def display_glycan_chains(self, results_tab, xmlfilename):
@@ -309,7 +358,7 @@ class PipelineResultsViewer(object):
 
         self.glycanViewHTMLoutput = self.generate_HTML_glycan_view(list_of_glycans)
 
-        pyrvapi.rvapi_add_tab(glycan_tab, tab_name, True)
+        pyrvapi.rvapi_add_tab(glycan_tab, tab_name, False)
         pyrvapi.rvapi_add_section(
             chain_sec, 'Detected Glycan chains in the input model', glycan_tab, 0, 0, 1, 1, False)
         pyrvapi.rvapi_add_text(self.glycanViewHTMLoutput,
