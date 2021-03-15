@@ -321,10 +321,11 @@ class PipelineResultsViewer(object):
         head = etree.Element('head')
         
         style = etree.Element('style')
-        style.text = "\nhtml {\n\tline-height: 1.6em;\n\tfont-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans-Serif;\n\tmargin: 10px;\n\ttext-align: left;\n\tborder-collapse: collapse;\n\tclear: both; }\n\nspan.folder {\n\tdisplay:block;\n\ttext-decoration:none;\n\tmargin:3px;\n\tmax-width:1000px;\n\theight:1.6em;\n\tpadding:1px;\n\tpadding-left:10px;\n\tpadding-right:10px;\n\tborder:2px solid #DDD;\n\ttext-align:left;\n\tfont-size:100%;\n\t-webkit-border-radius:10px;\n\tborder-radius:1px;\n\tbackground:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#EEE)); }\n\n.hidesection.hidden {visibility:hidden; width:650px; position:absolute; left:-9000;}\n\n.hidesection.displayed {display: block;}"
+        style.text = "\nhtml {\n\tline-height: 1.6em;\n\tfont-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans-Serif;\n\tmargin: 10px;\n\ttext-align: left;\n\tborder-collapse: collapse;\n\tclear: both; \n}\n\n.accordion {\n\tdisplay:block;\n\ttext-decoration:none;\n\tmargin:3px;\n\tmax-width:1000px;\n\theight:1.6em;\n\tpadding:1px;\n\tpadding-left:10px;\n\tpadding-right:10px;\n\tborder:2px solid #DDD;\n\ttext-align:left;\n\tfont-size:100%;\n\t-webkit-border-radius:10px;\n\tborder-radius:1px;\n\tbackground:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#EEE));\n\tcursor: pointer;\n\ttransition:0.4s \n}\n\n.active, .accordion:hover {\n\tbackground-color: #ccc;\n}\n\n.accordion:after {\n\tcontent: \'\\002B\';\n\tcolor: #777;\n\tfont-weight: bold;\n\tfloat: right;\n\tmargin-left: 5px;\n}\n\n.active:after {\n\tcontent: \"\\2212\";\n}\n\n.panel {\n\tpadding: 0 18px;\n\tbackground-color: white;\n\tmax-height: 0;\n\toverflow: hidden;\n\ttransition: max-height 0.2s ease-out;\n}\n"
         
         script = etree.Element('script')
-        script.text = "\nfunction toggleview(obj) {\n\tsrc = obj\n\twhile ( (' ' + obj.className +' ').indexOf(' hidesection ') == -1){\n\t\tif      ( obj.nextSibling != null ) obj = obj.nextSibling;\n\t\telse if ( obj.parentNode  != null ) obj = obj.parentNode;\n\t\telse                                return;\n\t}\n\tif ( (' ' + obj.className +' ').indexOf(' displayed ') > -1 ) {\n\t\t$(obj).slideUp(300,function(){obj.className = obj.className.replace( 'displayed' , 'hidden' );})\n\t\t//src.childNodes[0].nodeValue = src.childNodes[0].nodeValue.replace( \"\u25BC\", \"\u25B6\" );\n\n\t} else if ( (' ' + obj.className +' ').indexOf(' hidden ') > -1 )  {\n\t\t$(obj).slideDown(300,function(){obj.className = obj.className.replace( 'hidden' , 'displayed' );})\n\t\t//src.childNodes[0].nodeValue = src.childNodes[0].nodeValue.replace( \"\u25B6\", \"\u25BC\" );\n\t}\n}\n" 
+
+        script.text = "\nvar acc = document.getElementsByClassName(\"accordion\");\nvar i;\n\nfor (i = 0; i < acc.length; i++) {\n\t  acc[i].addEventListener(\"click\", function() {\n\t\tthis.classList.toggle(\"active\");\n\t\tvar panel = this.nextElementSibling;\n\t\tif (panel.style.maxHeight) {\n\t\t\tpanel.style.maxHeight = null;\n\t\t} else {\n\t\t\tpanel.style.maxHeight = panel.scrollHeight + \"px\";\n\t\t}\n\t});\n}" 
         
         head.append(style)
         html.append(head)
@@ -389,12 +390,10 @@ class PipelineResultsViewer(object):
                     GlyConnectIDParagraph.text = 'GlyConnect ID: Not Found'
                     divSVG.append(GlyConnectIDParagraph)
                     if glycan['Permutations'] is not None:
-                        aElement = etree.Element('a', attrib={'id': 'Closest permutations detected on GlyConnect database'})
-                        divSVG.append(aElement)
-                        spanFolder = etree.Element('span', attrib={'class': 'folder', 'onclick': 'toggleview(this)'})
-                        spanFolder.text = "Closest permutations detected on GlyConnect database"
-                        divSVG.append(spanFolder)
-                        sectionDiv = etree.Element('div', attrib={'class': 'hidesection hidden'})
+                        button = etree.Element('button', attrib={'class': 'accordion'})
+                        button.text = 'Closest permutations detected on GlyConnect database'
+                        divSVG.append(button)
+                        sectionDiv = etree.Element('div', attrib={'class': 'panel'})
                         sectionDivStyle = etree.Element('div', attrib={'style': 'border-width: 1px; padding-top: 10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
                         permutationList = glycan['Permutations']
 
@@ -465,9 +464,10 @@ class PipelineResultsViewer(object):
         
         body.append(divGlobal)
         body.append(script)
+
         self.glycanViewHTML = os.path.join(self.directory, 'glycanview.html')
-        etree.ElementTree(html).write(self.glycanViewHTML, pretty_print=True, encoding='utf-8',
-                             method='html')
+        
+        etree.ElementTree(html).write(self.glycanViewHTML, pretty_print=True, encoding='unicode', method='html')
         parser = etree.HTMLParser()
         glycanViewHACK = etree.parse(self.glycanViewHTML, parser)
 
