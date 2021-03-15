@@ -321,7 +321,7 @@ class PipelineResultsViewer(object):
         head = etree.Element('head')
         
         style = etree.Element('style')
-        style.text = "\nhtml {\n\tline-height: 1.6em;\n\tfont-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans-Serif;\n\tmargin: 10px;\n\ttext-align: left;\n\tborder-collapse: collapse;\n\tclear: both; \n}\n\n.accordion {\n\tdisplay:block;\n\ttext-decoration:none;\n\tmargin:3px;\n\tmax-width:1000px;\n\theight:1.6em;\n\tpadding:1px;\n\tpadding-left:10px;\n\tpadding-right:10px;\n\tborder:2px solid #DDD;\n\ttext-align:left;\n\tfont-size:100%;\n\t-webkit-border-radius:10px;\n\tborder-radius:1px;\n\tbackground:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#EEE));\n\tcursor: pointer;\n\ttransition:0.4s \n}\n\n.active, .accordion:hover {\n\tbackground-color: #ccc;\n}\n\n.accordion:after {\n\tcontent: \'\\002B\';\n\tcolor: #777;\n\tfont-weight: bold;\n\tfloat: right;\n\tmargin-left: 5px;\n}\n\n.active:after {\n\tcontent: \"\\2212\";\n}\n\n.panel {\n\tpadding: 0 18px;\n\tbackground-color: white;\n\tmax-height: 0;\n\toverflow: hidden;\n\ttransition: max-height 0.2s ease-out;\n}\n"
+        style.text = "\nhtml {\n\tline-height: 1.6em;\n\tfont-family: \"Lucida Sans Unicode\", \"Lucida Grande\", Sans-Serif;\n\tmargin: 10px;\n\ttext-align: left;\n\tborder-collapse: collapse;\n\tclear: both; \n}\n\n.accordion {\n\tdisplay:block;\n\ttext-decoration:none;\n\tmargin:3px;\n\tmax-width:1000px;\n\theight:1.6em;\n\tpadding:1px;\n\tpadding-left:10px;\n\tpadding-right:10px;\n\tborder:2px solid #DDD;\n\ttext-align:left;\n\tfont-size:110%;\n\t-webkit-border-radius:10px;\n\tborder-radius:1px;\n\tbackground:-webkit-gradient(linear, 0% 0%, 0% 110%, from(#FFFFFF), to(#EEE));\n\tcursor: pointer;\n\ttransition:0.4s \n}\n\n.active, .accordion:hover {\n\tbackground-color: #ccc;\n}\n\n.accordion:after {\n\tcontent: \'\\002B\';\n\tcolor: #777;\n\tfont-weight: bold;\n\tfloat: right;\n\tmargin-left: 5px;\n}\n\n.active:after {\n\tcontent: \"\\2212\";\n}\n\n.panel {\n\tpadding: 0 18px;\n\tbackground-color: white;\n\tmax-height: 0;\n\toverflow: hidden;\n\ttransition: max-height 0.2s ease-out;\n}\n"
         
         script = etree.Element('script')
 
@@ -340,7 +340,7 @@ class PipelineResultsViewer(object):
         divGlobal.append(explanationParagraph)
         
         for glycan in list_of_glycans:
-            chainParagraph = etree.Element('p', attrib={'style': 'font-size:130%; padding:2px; margin-top:20px; margin-bottom:0px; font-weight:bold; margin-left:15px; clear:both'})
+            chainParagraph = etree.Element('p', attrib={'style': 'font-size:110%; padding:2px; margin-top:20px; margin-bottom:0px; font-weight:bold; margin-left:15px; clear:both'})
             modelledGlycanChainID = glycan['Chain'].text
             chainParagraph.text = "Chain " + modelledGlycanChainID
             divGlobal.append(chainParagraph)
@@ -368,25 +368,25 @@ class PipelineResultsViewer(object):
                 divSVG = etree.Element('div', attrib={'style': 'padding:10px;'})
                 divSVG.append(ElementSVGsource)
 
-                WURCSParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
+                WURCSParagraph = etree.Element('p', attrib={'style': 'font-size:110%; font-weight:bold'})
                 WURCSParagraph.text = glycan['WURCS'].text
                 divSVG.append(WURCSParagraph)
 
                 if glycan['GTCID'].text != "Unable to find GlyTouCan ID":
-                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
+                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:110%; font-weight:bold'})
                     GTCIDParagraph.text = 'GlyTouCan ID: ' + glycan['GTCID'].text
                     divSVG.append(GTCIDParagraph)
                 else:
-                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
+                    GTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:110%; font-weight:bold; color:#ff3300'})
                     GTCIDParagraph.text = 'GlyTouCan ID: Not Found'
                     divSVG.append(GTCIDParagraph)
 
                 if glycan['GlyConnectID'].text != "Unable to find GlyConnect ID":
-                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
+                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:110%; font-weight:bold'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: ' + glycan['GlyConnectID'].text
                     divSVG.append(GlyConnectIDParagraph)
                 else:
-                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
+                    GlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:110%; font-weight:bold; color:#ff3300'})
                     GlyConnectIDParagraph.text = 'GlyConnect ID: Not Found'
                     divSVG.append(GlyConnectIDParagraph)
                     if glycan['Permutations'] is not None:
@@ -398,7 +398,7 @@ class PipelineResultsViewer(object):
                         permutationList = glycan['Permutations']
 
                         for permutation in permutationList:
-                            permutationDivBorder = etree.Element('div', attrib={'style': 'border-width: 1px; padding-top: 10px; padding-bottom:10px; border-color:black; border-style:solid; border-radius:15px;'})
+                            permutationDivBorder = etree.Element('div', attrib={'style': 'border-width: 1px; padding-top: 10px; padding-bottom:10px; border-color:grey; border-style:dashed; border-radius:20px;'})
                             permutationGlycanSVGName = permutation['PermutationSVG'].text
                             permutationGlycanSVGPath = os.path.join(self.job_location, permutationGlycanSVGName)
                             if os.path.isfile(permutationGlycanSVGPath):
@@ -419,38 +419,66 @@ class PipelineResultsViewer(object):
                                 permutationDivBorder.append(permutationElementSVGsource)
 
                                 
-                                WURCSParagraphPermutation = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
+                                WURCSParagraphPermutation = etree.Element('p', attrib={'style': 'font-size:110%; font-weight:bold'})
                                 WURCSParagraphPermutation.text = permutation['PermutationWURCS'].text
                                 permutationDivBorder.append(WURCSParagraphPermutation)
 
-                                
-                                PermutationScore = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
-                                PermutationScore.text = 'Permutation Score(out of 100): ' + permutation['PermutationScore'].text
+                                permutation['PermutationScore'].text
+                                PermutationScore = etree.Element('p', attrib={'style': 'font-size:110%;'})
+                                PermutationScore.text = 'Permutation Score(out of 100): '
+                                if float(permutation['PermutationScore'].text) <= 1.00:
+                                    spanText = etree.Element('span', attrib={'style': 'color:#00ff00; font-weight: bold'})
+                                    spanText.text = permutation['PermutationScore'].text
+                                    PermutationScore.append(spanText)
+                                elif float(permutation['PermutationScore'].text) > 1.00 and float(permutation['PermutationScore'].text) <= 10.00:
+                                    spanText = etree.Element('span', attrib={'style': 'color:#ffa500; font-weight: bold'})
+                                    spanText.text = permutation['PermutationScore'].text
+                                    PermutationScore.append(spanText)                                    
+                                elif float(permutation['PermutationScore'].text) > 10.00:
+                                    spanText = etree.Element('span', attrib={'style': 'color:#ff3300; font-weight: bold'})
+                                    spanText.text = permutation['PermutationScore'].text
+                                    PermutationScore.append(spanText)                                     
+
                                 permutationDivBorder.append(PermutationScore)
 
 
-                                anomerPermutations = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
-                                anomerPermutations.text = 'Anomer Permutations: ' + permutation['anomerPermutations'].text
+                                anomerPermutations = etree.Element('p', attrib={'style': 'font-size:110%;'})
+                                anomerPermutations.text = 'Anomer Permutations: '
+                                spanTextAnomer = etree.Element('span', attrib={'style': 'font-weight: bold'})
+                                spanTextAnomer.text = permutation['anomerPermutations'].text
+                                anomerPermutations.append(spanTextAnomer)
                                 permutationDivBorder.append(anomerPermutations)
 
 
-                                residuePermutations = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
-                                residuePermutations.text = 'Residue Permutations: ' + permutation['residuePermutations'].text
+                                residuePermutations = etree.Element('p', attrib={'style': 'font-size:110%;'})
+                                residuePermutations.text = 'Residue Permutations: '
+                                spanTextResidue = etree.Element('span', attrib={'style': 'font-weight: bold'})
+                                spanTextResidue.text = permutation['residuePermutations'].text
+                                residuePermutations.append(spanTextResidue)                            
                                 permutationDivBorder.append(residuePermutations)
 
 
-                                residueDeletions = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
-                                residueDeletions.text = 'Residue Deletions: ' + permutation['residueDeletions'].text
+                                residueDeletions = etree.Element('p', attrib={'style': 'font-size:110%;'})
+                                residueDeletions.text = 'Residue Deletions: '
+                                spanTextDeletions = etree.Element('span', attrib={'style': 'font-weight: bold'})
+                                spanTextDeletions.text = permutation['residueDeletions'].text
+                                residueDeletions.append(spanTextDeletions)                                   
                                 permutationDivBorder.append(residueDeletions)
 
 
-                                PermutationGTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
-                                PermutationGTCIDParagraph.text = 'GlyTouCan ID: ' + permutation['PermutationGTCID'].text
+                                PermutationGTCIDParagraph = etree.Element('p', attrib={'style': 'font-size:110%;'})
+                                PermutationGTCIDParagraph.text = 'GlyTouCan ID: ' 
+                                spanTextPermutationGTCID = etree.Element('span', attrib={'style': 'font-weight: bold'})
+                                spanTextPermutationGTCID.text = permutation['PermutationGTCID'].text
+                                PermutationGTCIDParagraph.append(spanTextPermutationGTCID)  
                                 permutationDivBorder.append(PermutationGTCIDParagraph)
 
 
-                                PermutationGlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:130%; font-weight:bold'})
-                                PermutationGlyConnectIDParagraph.text = 'Glyconnect ID: ' + permutation['PermutationGlyConnectID'].text
+                                PermutationGlyConnectIDParagraph = etree.Element('p', attrib={'style': 'font-size:110%;'})
+                                PermutationGlyConnectIDParagraph.text = 'Glyconnect ID: '
+                                spanTextPermutationGlyConnectID = etree.Element('span', attrib={'style': 'font-weight: bold'})
+                                spanTextPermutationGlyConnectID.text = permutation['PermutationGlyConnectID'].text
+                                PermutationGlyConnectIDParagraph.append(spanTextPermutationGlyConnectID)  
                                 permutationDivBorder.append(PermutationGlyConnectIDParagraph)
 
                                 
