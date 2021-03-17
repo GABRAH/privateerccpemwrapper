@@ -716,7 +716,8 @@ class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
         super(PrivateerResultsOnFinish, self).__init__()
         self.job_location = job_location
 
-    def on_finish(self, parent_pipeline=None):
+    def on_finish(self, parent_pipeline=None, job_location=None):
         # generate RVAPI report
-        privateer_results.PrivateerResultsViewer(
+        results = privateer_results.PrivateerResultsViewer(
             job_location=self.job_location)
+        

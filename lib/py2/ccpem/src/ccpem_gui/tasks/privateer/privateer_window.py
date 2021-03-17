@@ -29,11 +29,10 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
     def __init__(self,
                  task,
                  parent=None):
+        self.results_dock = None
         super(PrivateerWindow, self).__init__(task=task,
                                              parent=parent)
-        self.rv_timer = QtCore.QTimer()
-        self.rv_timer.timeout.connect(self.set_rv_ui)
-        self.rv_timer.start(1500)
+
 
     def set_args(self):
         '''
@@ -344,6 +343,7 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
         '''
         RVAPI results viewer.
         '''
+        print("We in set_rv_ui")
         if hasattr(self.task, 'job_location'):
             if self.task.job_location is not None:
                 report = os.path.join(self.task.job_location,
@@ -359,16 +359,19 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
                     self.tabifyDockWidget(self.setup_dock, self.results_dock)
                     self.results_dock.show()
                     self.results_dock.raise_()
-                    self.rv_timer.stop()
+    
+    def set_on_job_finish(self):
+        self.set_on_job_finish_custom()
 
     def set_on_job_finish_custom(self):
         '''
         Actions to run on job completion.  For now show starting, refined
         pdb and experimental map.
         '''
+        print("We in set_on_job_finish_custom")
+        self.set_rv_ui()
         self.launcher.set_tree_view()
         self.launcher_dock.raise_()
-
 
 def main():
     '''
