@@ -342,10 +342,6 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
 
 
     def set_rv_ui(self):
-        '''
-        RVAPI results viewer.
-        '''
-        print("We in set_rv_ui")
         if self.task.job_location is not None:
             report = os.path.join(self.task.job_location,
                                     'report/index.html')
@@ -362,13 +358,8 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
                 self.results_dock.raise_()
     
     def set_on_job_finish_custom(self):
-        '''
-        Actions to run on job completion.  For now show starting, refined
-        pdb and experimental map.
-        '''
-        print("We in set_on_job_finish_custom")
-        results = privateer_results.PrivateerResultsViewer(
-            job_location=self.task.job_location)
+        # results = privateer_results.PrivateerResultsViewer(
+        #     job_location=self.task.job_location)
         self.launcher.set_tree_view()
         self.launcher_dock.raise_()
         self.launcher_dock.show()
