@@ -390,8 +390,8 @@ class Privateer(task_utils.CCPEMTask):
                            sleeptimer                   = self.args.sleeptimer ( ) )
         pl = [[pr.process]]
 
-        # custom_finish = PrivateerResultsOnFinish(
-        #     job_location=self.job_location)
+        custom_finish = PrivateerResultsOnFinish(
+            job_location=self.job_location)
 
         # Run pipeline
         # os.chdir(self.job_location)
@@ -405,7 +405,7 @@ class Privateer(task_utils.CCPEMTask):
                         taskname           = self.task_info.name,
                         title              = self.args.job_title.value,
                         verbose            = self.verbose,
-                        on_finish_custom   = None)
+                        on_finish_custom   = custom_finish)
         self.pipeline.start()
 
 
@@ -691,18 +691,18 @@ class PrivateerCLI(object):
             self.args.append                  ('-sleep_timer')
             self.args.append                  (self.sleeptimer)
 
-# class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
-#     '''
-#     Generate RVAPI results on finish.
-#     '''
+class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
+    '''
+    Generate RVAPI results on finish.
+    '''
 
-#     def __init__(self,
-#                  job_location):
-#         super(PrivateerResultsOnFinish, self).__init__()
-#         self.job_location = job_location
+    def __init__(self,
+                 job_location):
+        super(PrivateerResultsOnFinish, self).__init__()
+        self.job_location = job_location
 
-#     def on_finish(self, parent_pipeline=None, job_location=None):
-#         # generate RVAPI report
-#         results = privateer_results.PrivateerResultsViewer(
-#             job_location=self.job_location)
+    def on_finish(self, parent_pipeline=None, job_location=None):
+        # generate RVAPI report
+        results = privateer_results.PrivateerResultsViewer(
+            job_location=self.job_location)
         

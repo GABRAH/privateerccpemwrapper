@@ -163,7 +163,6 @@ class PrivateerResultsViewer(object):
                 i += 1
             pyrvapi.rvapi_flush()  
         if "Furanoses" in data:
-            pyrvapi.rvapi_add_tab(validation_tab, tab_name, True)
             pyrvapi.rvapi_add_table(
                 validation_table, 'Detailed validation data for Furanoses', validation_sec, 1, 0, 1, 1, False)
             pyrvapi.rvapi_put_horz_theader(
@@ -176,29 +175,27 @@ class PrivateerResultsViewer(object):
                                         'Total puckering amplitude, measured in Angstroems', 3)
             pyrvapi.rvapi_put_horz_theader(validation_table, 'Phi',
                                         'Phi of monosaccharide', 4)
-            pyrvapi.rvapi_put_horz_theader(validation_table, 'Theta',
-                                        'Theta of monosaccharide', 5)
             pyrvapi.rvapi_put_horz_theader(validation_table, 'Anomer',
-                                        'Anomer of monosaccharide', 6)
+                                        'Anomer of monosaccharide', 5)
             pyrvapi.rvapi_put_horz_theader(validation_table, 'D/L<sup>2</sup>',
-                                        'Whenever N is displayed in the D/L column, it means that Privateer has been unable to determine the handedness based solely on the structure.', 7)
+                                        'Whenever N is displayed in the D/L column, it means that Privateer has been unable to determine the handedness based solely on the structure.', 6)
             pyrvapi.rvapi_put_horz_theader(validation_table, 'Conformation',
-                                        'Conformation of the sugar.', 8)
+                                        'Conformation of the sugar.', 7)
             pyrvapi.rvapi_put_horz_theader(validation_table, 'RSCC',
-                                        'Real Space Correlation Coefficient.', 9)
+                                        'Real Space Correlation Coefficient.', 8)
             pyrvapi.rvapi_put_horz_theader(validation_table, 'BFactor',
-                                        'BFactor of monosaccharide.', 10)
+                                        'BFactor of monosaccharide.', 9)
             pyrvapi.rvapi_put_horz_theader(validation_table, 'Diagnosic',
-                                        'Geometric quality of the monosaccharide.', 11)
+                                        'Geometric quality of the monosaccharide.', 10)
             
             i = 0  # row
-            for entries in data['Pyranoses']:
+            for entries in data['Furanoses']:
                 j = 0  # column
                 for name in entries:
                     if j == 0:
                         pyrvapi.rvapi_put_table_string(
                             validation_table, str(i + 1), i, j)  # fill in cycle number
-                        j += 1  # %0.1f %
+                        j += 1  
                         pyrvapi.rvapi_put_table_string(
                             validation_table, entries[name].text, i, j)  # fill in built values
                     else:
