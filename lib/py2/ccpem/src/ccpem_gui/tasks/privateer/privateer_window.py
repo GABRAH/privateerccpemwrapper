@@ -365,6 +365,19 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
         self.launcher_dock.show()
         self.set_rv_ui()
 
+    def run_coot_custom ( self ):
+        # Initialise
+        args                                  = list ( )
+        path                                  = ''
+        
+
+        path                                  = os.path.join ( self.task.job_location, 'privateer-results.py' )
+            
+        
+        args.append                           ( '--script' )
+        args.append                           ( path )
+        gui_process.run_coot                  ( args = args )
+
 def main():
     '''
     Launch standalone task runner.
