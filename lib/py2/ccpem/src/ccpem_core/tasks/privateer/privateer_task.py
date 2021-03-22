@@ -53,9 +53,6 @@ class Privateer(task_utils.CCPEMTask):
                                            verbose          = verbose,
                                            parent           = parent )
 
-    # .././privateer -pdbin ../../../tests/test_data/6m15.pdb -mapin ../../../tests/test_data/6m15.map -resolution 2.38 -glytoucan ../../../src/privateer/database.json
-    # Wrapper inspired by proshade
-
     def parser(self):
         parser = ccpem_argparser.ccpemArgParser()
         #
@@ -393,11 +390,11 @@ class Privateer(task_utils.CCPEMTask):
                            sleeptimer                   = self.args.sleeptimer ( ) )
         pl = [[pr.process]]
 
-        custom_finish = PrivateerResultsOnFinish(
-            job_location=self.job_location)
+        # custom_finish = PrivateerResultsOnFinish(
+        #     job_location=self.job_location)
 
         # Run pipeline
-        os.chdir(self.job_location)
+        # os.chdir(self.job_location)
         self.pipeline = process_manager.CCPEMPipeline (
                         pipeline           = pl,
                         job_id             = job_id,
@@ -408,7 +405,7 @@ class Privateer(task_utils.CCPEMTask):
                         taskname           = self.task_info.name,
                         title              = self.args.job_title.value,
                         verbose            = self.verbose,
-                        on_finish_custom   = custom_finish )
+                        on_finish_custom   = None)
         self.pipeline.start()
 
 
@@ -489,15 +486,6 @@ class PrivateerCLI(object):
                            location           = self.job_location,
                            stdin              = None )
 
-    def representsInt ( self, str_in ):
-        try:
-            int ( str_in )
-            return True
-        except ValueError:
-            return False
-
-    # .././privateer -pdbin ../../../tests/test_data/6m15.pdb -mapin ../../../tests/test_data/6m15.map -resolution 2.38 -glytoucan ../../../src/privateer/database.json
-
     def set_args ( self ):
         self.args.append('-pdbin')
         self.args.append(self.input_model)
@@ -510,9 +498,6 @@ class PrivateerCLI(object):
 
         self.args.append('-radiusin')
         self.args.append(self.mask_radius)
-
-        # self.appendCommandScript("valstring %s,%s/%s/%s/%s/%s/%s,%s,%s,%s"%(self.container.controlParameters.CODEIN,self.container.controlParameters.RING_OXYGEN,self.container.controlParameters.RING_C1,self.container.controlParameters.RING_C2,self.container.controlParameters.RING_C3,self.container.controlParameters.RING_C4,self.container.controlParameters.RING_C5,self.container.controlParameters.ANOMER,self.container.controlParameters.HAND,self.container.controlParameters.CONFORMATION_PYRANOSE ))
-        # self.appendCommandScript("codein %s"%(self.container.controlParameters.CODEIN))
 
         if self.undefinedsugar:
             if self.input_ring_conformation == "pyranose":
@@ -706,18 +691,18 @@ class PrivateerCLI(object):
             self.args.append                  ('-sleep_timer')
             self.args.append                  (self.sleeptimer)
 
-class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
-    '''
-    Generate RVAPI results on finish.
-    '''
+# class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
+#     '''
+#     Generate RVAPI results on finish.
+#     '''
 
-    def __init__(self,
-                 job_location):
-        super(PrivateerResultsOnFinish, self).__init__()
-        self.job_location = job_location
+#     def __init__(self,
+#                  job_location):
+#         super(PrivateerResultsOnFinish, self).__init__()
+#         self.job_location = job_location
 
-    def on_finish(self, parent_pipeline=None, job_location=None):
-        # generate RVAPI report
-        results = privateer_results.PrivateerResultsViewer(
-            job_location=self.job_location)
+#     def on_finish(self, parent_pipeline=None, job_location=None):
+#         # generate RVAPI report
+#         results = privateer_results.PrivateerResultsViewer(
+#             job_location=self.job_location)
         

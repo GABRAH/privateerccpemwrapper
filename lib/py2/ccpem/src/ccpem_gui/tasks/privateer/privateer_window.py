@@ -12,9 +12,11 @@ import os
 
 from PyQt4 import QtGui, QtCore, QtWebKit
 
-from ccpem_core.tasks.privateer import privateer_task
 from ccpem_gui.utils import window_utils
 from ccpem_core.ccpem_utils import ccpem_file_types
+from ccpem_core.tasks.privateer import privateer_task
+from ccpem_core.tasks.privateer import privateer_results
+from ccpem_gui.utils import gui_process
 from ccpem_gui.utils import command_line_launch
 from ccpem_core.ccpem_utils import get_test_data_path
 from ccpem_core.test_data.tasks import privateer as test_data
@@ -24,7 +26,7 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
     '''
     Privateer window.
     '''
-    gui_test_args = get_test_data_path(test_data, 'unittest_args.json')
+    # gui_test_args = get_test_data_path(test_data, 'unittest_args.json')
 
     def __init__(self,
                  task,
@@ -344,34 +346,33 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
         RVAPI results viewer.
         '''
         print("We in set_rv_ui")
-        if hasattr(self.task, 'job_location'):
-            if self.task.job_location is not None:
-                report = os.path.join(self.task.job_location,
-                                      'report/index.html')
-                if os.path.exists(report):
-                    self.rv_view = QtWebKit.QWebView()
-                    self.rv_view.load(QtCore.QUrl(report))
-                    self.results_dock = QtGui.QDockWidget('Results',
-                                                          self,
-                                                          QtCore.Qt.Widget)
-                    self.results_dock.setToolTip('Results overview')
-                    self.results_dock.setWidget(self.rv_view)
-                    self.tabifyDockWidget(self.setup_dock, self.results_dock)
-                    self.results_dock.show()
-                    self.results_dock.raise_()
+        if self.task.job_location is not None:
+            report = os.path.join(self.task.job_location,
+                                    'report/index.html')
+            if os.path.exists(report):
+                self.rv_view = QtWebKit.QWebView()
+                self.rv_view.load(QtCore.QUrl(report))
+                self.results_dock = QtGui.QDockWidget('Results',
+                                                        self,
+                                                        QtCore.Qt.Widget)
+                self.results_dock.setToolTip('Results overview')
+                self.results_dock.setWidget(self.rv_view)
+                self.tabifyDockWidget(self.setup_dock, self.results_dock)
+                self.results_dock.show()
+                self.results_dock.raise_()
     
-    def set_on_job_finish(self):
-        self.set_on_job_finish_custom()
-
     def set_on_job_finish_custom(self):
         '''
         Actions to run on job completion.  For now show starting, refined
         pdb and experimental map.
         '''
         print("We in set_on_job_finish_custom")
-        self.set_rv_ui()
+        results = privateer_results.PrivateerResultsViewer(
+            job_location=self.task.job_location)
         self.launcher.set_tree_view()
         self.launcher_dock.raise_()
+        self.launcher_dock.show()
+        self.set_rv_ui()
 
 def main():
     '''

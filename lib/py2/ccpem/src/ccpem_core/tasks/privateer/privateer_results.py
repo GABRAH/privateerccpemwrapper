@@ -22,7 +22,6 @@ class PrivateerResultsViewer(object):
     '''
     Get Privateer results from program.xml
     '''
-    print("PrivateerResultsViewer")
     def __init__(self,
                  job_location=None,
                  xmlfilename=None):
