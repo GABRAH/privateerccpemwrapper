@@ -26,7 +26,7 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
     '''
     Privateer window.
     '''
-    # gui_test_args = get_test_data_path(test_data, 'unittest_args.json')
+    gui_test_args = get_test_data_path(test_data, 'unittest_args.json')
 
     def __init__(self,
                  task,
