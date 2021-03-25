@@ -34,7 +34,7 @@ class Privateer(task_utils.CCPEMTask):
 
     commands = {'refmac': settings.which(program='refmac5'),
             'coot': settings.which(program='coot'),
-            'privateer': settings.which('/home/harold/Dev/privateer_master/build/executable/./privateer')
+            'privateer': settings.which('privateer')
             }
 
     def __init__ ( self,
