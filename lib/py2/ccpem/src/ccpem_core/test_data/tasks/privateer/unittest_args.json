@@ -6,7 +6,6 @@
     "glytoucan": true,
     "closestmatch": false,
     "allpermutations": false,
-    "singlethreaded": false,
     "mask_radius": 2.5,
     "expression_system_mode": "undefined",
     "undefinedsugar": false,

@@ -105,14 +105,7 @@ class Privateer(task_utils.CCPEMTask):
                                 metavar         = 'All permutations',
                                 type            = bool,
                                 default         = False )
-
-        parser.add_argument (   '-singlethreaded',
-                                '--singlethreaded',
-                                help            = 'Run Privateer in single threaded mode',
-                                metavar         = 'Single Thread Mode',
-                                type            = bool,
-                                default         = False )
-
+        
         parser.add_argument (   '-mask_radius',
                                 '--mask_radius',
                                 help            = 'Change the mask radius around the sugar atoms to _value_ Angstrom',
@@ -367,7 +360,6 @@ class Privateer(task_utils.CCPEMTask):
                            glytoucan                    = self.args.glytoucan ( ),
                            closestmatch                 = self.args.closestmatch ( ),
                            allpermutations              = self.args.allpermutations ( ),
-                           singlethreaded               = self.args.singlethreaded ( ),
                            mask_radius                  = self.args.mask_radius ( ),
                            expression_system_mode       = self.args.expression_system_mode ( ),
                            undefinedsugar               = self.args.undefinedsugar ( ),
@@ -424,7 +416,6 @@ class PrivateerCLI(object):
                    glytoucan,
                    closestmatch,
                    allpermutations,
-                   singlethreaded,
                    mask_radius,
                    expression_system_mode,
                    undefinedsugar,
@@ -454,7 +445,6 @@ class PrivateerCLI(object):
         self.glytoucan                      = glytoucan
         self.closestmatch                   = closestmatch
         self.allpermutations                = allpermutations
-        self.singlethreaded                 = singlethreaded
         self.mask_radius                    = mask_radius
         self.expression_system_mode         = expression_system_mode
         self.undefinedsugar                 = undefinedsugar
@@ -680,14 +670,11 @@ class PrivateerCLI(object):
             if self.allpermutations and not self.closestmatch:
                 self.args.append                  ( '-all_permutations' )
         
-        if self.singlethreaded:
-            self.args.append                  ('-singlethreaded')
-        
-        if self.ncpus is not None and not self.singlethreaded:
+        if self.ncpus is not None:
             self.args.append                  ('-cores')
             self.args.append                  (self.ncpus)
 
-        if self.sleeptimer and not self.singlethreaded:
+        if self.sleeptimer:
             self.args.append                  ('-sleep_timer')
             self.args.append                  (self.sleeptimer)
 

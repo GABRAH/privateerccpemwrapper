@@ -283,20 +283,24 @@ class PrivateerResultsViewer(object):
             xmax_ok_Bravo = len(low_energy_pyranoses)
             xmax_conformation_Bravo = len(high_energy_pyranoses)
             xmax_other_Bravo = len(other_issues_pyranoses)
+            xvalues = []
             for i in range(0, xmax_ok_Bravo):
                 dx_ok_Bravo.add_datum(float(low_energy_pyranoses[i][xcol_Bravo].text))
                 dy_ok_Bravo.add_datum(float(low_energy_pyranoses[i][ycol_Bravo].text))
+                xvalues.append(float(low_energy_pyranoses[i][xcol_Bravo].text))
             for i in range(0, xmax_conformation_Bravo):
                 dx_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][xcol_Bravo].text))
                 dy_conformation_Bravo.add_datum(float(high_energy_pyranoses[i][ycol_Bravo].text))
+                xvalues.append(float(high_energy_pyranoses[i][xcol_Bravo].text))
             for i in range(0, xmax_other_Bravo):
                 dx_other_Bravo.add_datum(float(other_issues_pyranoses[i][xcol_Bravo].text))
                 dy_other_Bravo.add_datum(float(other_issues_pyranoses[i][ycol_Bravo].text))
+                xvalues.append(float(other_issues_pyranoses[i][xcol_Bravo].text))
             plotBravo = API.graph_plot(graphWid1, "BFactor vs RSCC", xaxlabel_Bravo, yaxlabel_Bravo)
             plotBravo.reset_xticks()
             plotBravo.reset_yticks()
             yticks = [0.0, 0.5, 0.7, 1.0]
-            for i in range(0, 101, 20):
+            for i in range(0, int(max(xvalues)) + 20, 20):
                 plotBravo.add_xtick(i, '%d' % (i))
             for i in yticks:
                 plotBravo.add_ytick(i, '%.1f' % (i))

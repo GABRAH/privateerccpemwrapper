@@ -280,17 +280,6 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
         set_privateer_ncpus_half_cpus_button.setToolTip("Use half of the available Cores available on the CPU on Privateer")
         privateer_ncpus_layout.addWidget(set_privateer_ncpus_half_cpus_button)
 
-        # Privateer parallelism settings
-        self.singlethreaded = window_utils.CheckArgInput(
-            parent=self,
-            label='Run Privateer in single-threaded mode.',
-            label_width=300,
-            arg_name='singlethreaded',
-            args=self.args)
-        self.parallelism_settings.add_extension_widget(self.singlethreaded)
-        self.singlethreaded.value_line.stateChanged.connect(
-            self.set_privateer_ncpus_invisible)
-
         self.sleeptimer = window_utils.NumberArgInput(
             parent=self,
             arg_name='sleeptimer',
@@ -307,16 +296,6 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
 
     def set_privateer_half_cores(self):
         self.ncpus.set_arg_value(QtCore.QThread.idealThreadCount() / 2)
-
-    def set_privateer_ncpus_invisible(self):
-        if self.args.singlethreaded():
-            self.privateer_ncpus_widget.hide()
-            self.ncpus.hide()
-            self.sleeptimer.hide()
-        else:
-            self.privateer_ncpus_widget.show()
-            self.ncpus.show()
-            self.sleeptimer.show()
 
     
     def set_conformation_input_options(self):
