@@ -280,15 +280,6 @@ class PrivateerWindow(window_utils.CCPEMTaskWindow):
         set_privateer_ncpus_half_cpus_button.setToolTip("Use half of the available Cores available on the CPU on Privateer")
         privateer_ncpus_layout.addWidget(set_privateer_ncpus_half_cpus_button)
 
-        self.sleeptimer = window_utils.NumberArgInput(
-            parent=self,
-            arg_name='sleeptimer',
-            minimum=1,
-            required=False,
-            args=self.args)
-        self.parallelism_settings.add_extension_widget(self.sleeptimer)
-
-
 
     # Detect number of CPUs
     def set_privateer_all_cores(self):

@@ -326,13 +326,6 @@ class Privateer(task_utils.CCPEMTask):
                                 type=int,
                                 default=None)
         
-        parser.add_argument(    '-sleeptimer',
-                                '--sleeptimer',
-                                help='Set sleep timer value between parallel loops',
-                                metavar='Sleep Timer',
-                                type=int,
-                                default=1)
-        
         parser.add_argument(
             '-keywords',
             '--keywords',
@@ -378,8 +371,7 @@ class Privateer(task_utils.CCPEMTask):
                            diagram_orientation          = self.args.diagram_orientation ( ),
                            color_scheme                 = self.args.color_scheme ( ),
                            color_scheme_outlines        = self.args.color_scheme_outlines ( ),
-                           ncpus                        = self.args.ncpus ( ),
-                           sleeptimer                   = self.args.sleeptimer ( ) )
+                           ncpus                        = self.args.ncpus ( ) )
         pl = [[pr.process]]
 
         custom_finish = PrivateerResultsOnFinish(
@@ -434,8 +426,7 @@ class PrivateerCLI(object):
                    diagram_orientation,
                    color_scheme,
                    color_scheme_outlines,
-                   ncpus,
-                   sleeptimer ):
+                   ncpus):
         self.command                        = command
         self.prdatabase_path                = prdatabase_path
         self.job_location                   = job_location
@@ -464,7 +455,6 @@ class PrivateerCLI(object):
         self.color_scheme                   = color_scheme
         self.color_scheme_outlines          = color_scheme_outlines
         self.ncpus                          = ncpus
-        self.sleeptimer                     = sleeptimer
        
         self.args                             = []
         self.set_args                         ()
@@ -673,10 +663,6 @@ class PrivateerCLI(object):
         if self.ncpus is not None:
             self.args.append                  ('-cores')
             self.args.append                  (self.ncpus)
-
-        if self.sleeptimer:
-            self.args.append                  ('-sleep_timer')
-            self.args.append                  (self.sleeptimer)
 
 class PrivateerResultsOnFinish(process_manager.CCPEMPipelineCustomFinish):
     '''
